@@ -1,5 +1,7 @@
 package Devel::StackTrace;
 
+use 5.005;
+
 use strict;
 use vars qw($VERSION);
 
@@ -110,6 +112,13 @@ sub reset_pointer
     my Devel::StackTrace $self = shift;
 
     $self->{index} = undef;
+}
+
+sub frames
+{
+    my Devel::StackTrace $self = shift;
+
+    return @{ $self->{frames} };
 }
 
 sub frame
@@ -301,6 +310,26 @@ Perl 5.6.0 that have yet to be incorporated.
 This code was created to support my L<Exception::Class::Base> class
 (part of Exception::Class) but may be useful in other contexts.
 
+=head1 'TOP' AND 'BOTTOM' OF THE STACK
+
+When describing the methods of the trace object, I use the words 'top'
+and 'bottom'.  In this context, the 'top' frame on the stack is the
+most recent frame and the 'bottom' is the least recent.
+
+Here's an example:
+
+  foo();  # bottom frame is here
+
+  sub foo
+  {
+     bar();
+  }
+
+  sub bar
+  {
+     Devel::StackTrace->new;  # top frame is here.
+  }
+
 =head1 Devel::StackTrace METHODS
 
 =over 4
@@ -346,6 +375,10 @@ properly.
 Resets the pointer so that the next call C<next_frame> or
 C<prev_frame> will start at the top or bottom of the stack, as
 appropriate.
+
+=item * frames
+
+Returns a list of Devel::StackTraceFrame objects.  The order they are returned is from top (most
 
 =item * frame ($index)
 
