@@ -1,6 +1,6 @@
 use strict;
 
-use Test::More tests => 25;
+use Test::More tests => 27;
 
 BEGIN { use_ok('Devel::StackTrace') }
 
@@ -147,8 +147,25 @@ EOF
     is( scalar @args, 1,
         "Only one argument should have been passed in the call to trace()" );
 
-    is( $args[0], 'RefTest2 object (D::V)',
-        "Actual object should be replaced by string 'RefTest2 object (D::V)'" );
+    like( $args[0], qr/RefTest2=HASH/,
+        "Actual object should be replaced by string 'RefTest2=HASH'" );
+}
+
+# Not storing references (deprecated interface)
+{
+    my $obj = RefTest3->new;
+
+    my $trace = $obj->{trace};
+
+    my $call_to_trace = ($trace->frames)[1];
+
+    my @args = $call_to_trace->args;
+
+    is( scalar @args, 1,
+        "Only one argument should have been passed in the call to trace()" );
+
+    like( $args[0], qr/RefTest3=HASH/,
+        "Actual object should be replaced by string 'RefTest3=HASH'" );
 }
 
 # This means I can move these lines down without constantly fiddling
@@ -213,6 +230,22 @@ sub trace
 }
 
 package RefTest2;
+
+sub new
+{
+    my $self = bless {}, shift;
+
+    $self->{trace} = trace($self);
+
+    return $self;
+}
+
+sub trace
+{
+    Devel::StackTrace->new( no_refs => 1 );
+}
+
+package RefTest3;
 
 sub new
 {
