@@ -1,3 +1,9 @@
+1.08  Feb 23, 2004
+
+- Some tests failed on Win32 because they were hardcoded to expect a
+file name with forward slashes.  Reported by Steve Hay.
+
+
 1.07  Feb 21, 2004
 
 - This release includes a change to the overload handling that is

@@ -13,6 +13,9 @@ BEGIN
     use_ok('Devel::StackTrace');
 }
 
+sub get_file_name { (caller(0))[1] }
+my $test_file_name = get_file_name();
+
 # Test all accessors
 {
     my $trace = foo();
@@ -34,7 +37,7 @@ BEGIN
     is( $f[0]->package, 'main',
         "First frame package should be main" );
 
-    is( $f[0]->filename, 't/01-basic.t', "First frame filename should be t/01-basic.t" );
+    is( $f[0]->filename, $test_file_name, "First frame filename should be $test_file_name" );
 
     is( $f[0]->line, 1012, "First frame line should be 1012" );
 
@@ -46,11 +49,11 @@ BEGIN
     is( $f[0]->wantarray, 0,
         "First frame wantarray should be false" );
 
-    my $trace_text = <<'EOF';
-Trace begun at t/01-basic.t line 1012
-main::baz(1, 2) called at t/01-basic.t line 1007
-main::bar(1) called at t/01-basic.t line 1002
-main::foo at t/01-basic.t line 18
+    my $trace_text = <<"EOF";
+Trace begun at $test_file_name line 1012
+main::baz(1, 2) called at $test_file_name line 1007
+main::bar(1) called at $test_file_name line 1002
+main::foo at $test_file_name line 21
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
@@ -86,9 +89,9 @@ EOF
 {
     my $trace = baz();
 
-    my $trace_text = <<'EOF';
-Trace begun at t/01-basic.t line 1012
-main::baz at t/01-basic.t line 87
+    my $trace_text = <<"EOF";
+Trace begun at $test_file_name line 1012
+main::baz at $test_file_name line 90
 EOF
 
     my $t = "$trace";
