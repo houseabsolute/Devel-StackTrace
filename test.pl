@@ -147,7 +147,7 @@ EOF
     is( scalar @args, 1,
         "Only one argument should have been passed in the call to trace()" );
 
-    is( $args[0], 'RefTest2 object',
+    is( $args[0], 'RefTest2 object (D::V)',
         "Actual object should be replaced by string 'RefTest2 object (D::V)'" );
 }
 
