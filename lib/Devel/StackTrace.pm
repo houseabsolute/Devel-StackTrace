@@ -11,7 +11,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub new
 {
