@@ -3,3 +3,4 @@ MANIFEST
 Makefile.PL
 StackTrace.pm
 test.pl
+Changes
