@@ -11,20 +11,21 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.05';
+$VERSION = '1.07';
 
 1;
 
 sub new
 {
-    my $proto = shift;
-    my $class = ref $proto || $proto;
+    my $class = shift;
+    my %p = @_;
 
     my $self = bless { index => undef,
 		       frames => [],
+                       respect_overload => $p{respect_overload},
 		     }, $class;
 
-    $self->_add_frames(@_);
+    $self->_add_frames(%p);
 
     return $self;
 }
@@ -36,11 +37,13 @@ sub _add_frames
 
     $p{no_refs} = delete $p{no_object_refs} if exists $p{no_object_refs};
 
-    my (%i_pack, %i_class);
+    my (@i_pack_re, %i_class);
     if ($p{ignore_package})
     {
-	$p{ignore_package} = [$p{ignore_package}] unless ref $p{ignore_package};
-	%i_pack = map {$_ => 1} @{ $p{ignore_package} };
+	$p{ignore_package} =
+            [$p{ignore_package}] unless UNIVERSAL::isa( $p{ignore_package}, 'ARRAY' );
+
+        @i_pack_re = map { ref $_ ? $_ : qr/^\Q$_\E$/ } @{ $p{ignore_package} };
     }
 
     if ($p{ignore_class})
@@ -50,14 +53,13 @@ sub _add_frames
     }
 
     my $p = __PACKAGE__;
-    $i_pack{$p} = 1;
+    push @i_pack_re, qr/^\Q$p\E$/;
 
     my $x = 0;
     my @c;
     while ( do { package DB; @DB::args = (); @c = caller($x++) } )
     {
-	# Do the quickest ones first.
-	next if $i_pack{ $c[0] };
+        next if grep { $c[0] =~ /$_/ } @i_pack_re;
 	next if grep { $c[0]->isa($_) } keys %i_class;
 
         $self->_add_frame( $p{no_refs}, \@c )
@@ -94,13 +96,33 @@ sub _add_frame
                                   # versions of E::C::B
                                   $_->{message};
                               } }
-                         : "$_"
+                         : $self->_ref_as_string($_)
                        )
                      : $_
                    ) } @a;
     }
 
-    push @{ $self->{frames} }, Devel::StackTraceFrame->new( $c, \@a );
+    push @{ $self->{frames} },
+        Devel::StackTraceFrame->new( $c, \@a, $self->{respect_overload} );
+}
+
+sub _ref_as_string
+{
+    my $self = shift;
+
+    if ( ref $_[0] &&
+         ! $self->{respect_overload} &&
+         require overload &&
+         overload::Overloaded($_[0])
+       )
+    {
+        return overload::StrVal($_[0]);
+    }
+    else
+    {
+        # force stringification
+        $_[0] . '';
+    }
 }
 
 sub next_frame
@@ -219,7 +241,9 @@ sub new
 
     @{ $self }{ @fields } = @{$_[0]};
 
-    $self->{args} = $_[1] ? $_[1] : [];
+    $self->{args} = $_[1];
+
+    $self->{respect_overload} = $_[2];
 
     return $self;
 }
@@ -277,8 +301,8 @@ sub as_string
 		# set args to the string "undef" if undefined
 		$_ = "undef", next unless defined $_;
 
-		# force stringification
-		$_ .= '' if ref $_;
+                # hack!
+                $_ = $self->Devel::StackTrace::_ref_as_string($_);
 
 		s/'/\\'/g;
 
@@ -398,6 +422,14 @@ your objects go out of scope.
 
 Devel::StackTrace replaces any references with their stringified
 representation.
+
+=item * respect_overload => $boolean
+
+By default, Devel::StackTrace will call C<overload::StrVal()> to get
+the underlying string representation of an object, instead of
+respecting the object's stringification overloading.  If you would
+prefer to see the overloaded representation of objects in stack
+traces, then set this parameter to true.
 
 =back
 

@@ -1,3 +1,17 @@
+1.07  Feb 21, 2004
+
+- This release includes a change to the overload handling that is
+necessary for cooperation with Exception::Class.
+
+
+1.06  Feb 21, 2004
+
+- Devel::StackTrace now uses overload::StrVal() to get the underlying
+string value of an overloaded object when creating a stack frame for
+display.  This can be turned off by setting respect_overload to a true
+value.  Suggested by Matt Sisk.
+
+
 1.05  Feb 17, 2004
 
 - Devel::StackTrace incorrectly reported that arguments were being

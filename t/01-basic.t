@@ -4,7 +4,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 29;
+    my $tests = 32;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
@@ -201,6 +201,43 @@ if ( $Exception::Class::VERSION >= 1.09 )
     is( scalar @args, 0, 'no args given to eval block' );
 }
 
+{
+    {
+        package FooBarBaz;
+
+        sub func2 { return Devel::StackTrace->new( ignore_package => qr/^FooBar/ ) }
+        sub func1 { FooBarBaz::func2() }
+    }
+
+    my $trace = FooBarBaz::func1('args');
+
+    my @f = $trace->frames;
+
+    is( scalar @f, 1, 'check regex as ignore_package arg' );
+}
+
+{
+    package StringOverloaded;
+
+    use overload '""' => sub { 'overloaded' };
+}
+
+{
+    my $o = bless {}, 'StringOverloaded';
+
+    my $trace = baz($o);
+
+    unlike( $trace->as_string, qr/\boverloaded\b/, 'overloading is ignored by default' );
+}
+
+{
+    my $o = bless {}, 'StringOverloaded';
+
+    my $trace = respect_overloading($o);
+
+    like( $trace->as_string, qr/\boverloaded\b/, 'overloading is ignored by default' );
+}
+
 
 # This means I can move these lines down without constantly fiddling
 # with the checks for line numbers in the tests.
@@ -225,6 +262,12 @@ sub quux
 {
     Devel::StackTrace->new( no_refs => 1 );
 }
+
+sub respect_overloading
+{
+    Devel::StackTrace->new( respect_overload => 1 );
+}
+
 
 package Test;
 
