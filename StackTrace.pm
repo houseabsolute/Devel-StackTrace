@@ -51,15 +51,14 @@ sub _add_frames
     # This _will_ cause all subclasses of this class to be ignored as
     # well.
     my $p = __PACKAGE__;
-    $i_class{$p} = 1;
+    $i_pack{$p} = 1;
 
     my $x = 0;
     my @c;
     while ( do { package DB; @c = caller($x++) } )
     {
 	# Do the quickest ones first.
-	next if ( exists $p{ignore_package} &&
-		  $i_pack{ $c[0] } );
+	next if $i_pack{ $c[0] };
 	next if ( grep { $c[0]->isa($_) } keys %i_class );
 
 	# eval and is_require are only returned when applicable.
@@ -135,6 +134,7 @@ $VERSION = '0.01';
     no strict 'refs';
     foreach my $f (keys %{__PACKAGE__.'::FIELDS'})
     {
+	next if $f eq 'args';
 	*{$f} = sub { my StackTraceFrame $s = shift; return $s->{$f} };
     }
 }
@@ -155,6 +155,13 @@ sub new
     @{ $self }{ qw( package filename line subroutine hasargs wantarray evaltext is_require args ) } = @_;
 
     return $self;
+}
+
+sub args
+{
+    my StackTraceFrame $self = shift;
+
+    return @{ $self->{args} };
 }
 
 sub as_string
@@ -193,15 +200,19 @@ sub as_string
 	# if there are any arguments in the sub-routine call, format
 	# them according to the format variables defined earlier in
 	# this file and join them onto the $sub sub-routine string
-	if ( @{ $self->{args} } )
+	#
+	# We copy them because they're going to be modified.
+	#
+	if ( my @a = @{ $self->{args} } )
 	{
-	    for (@{ $self->{args} })
+	    for (@a)
 	    {
 		# set args to the string "undef" if undefined
 		$_ = "undef", next unless defined $_;
 		if (ref $_)
 		{
-		    # dunno what this is for...
+		    # dunno what this is for... (I bet it's to force a
+		    # stringification if available -dave)
 		    $_ .= '';
 		}
 
@@ -216,7 +227,7 @@ sub as_string
 	    }
 
 	    # append ('all', 'the', 'arguments') to the $sub string
-	    $sub .= '(' . join(', ', @{ $self->{args} }) . ')';
+	    $sub .= '(' . join(', ', @a) . ')';
 	    $sub .= ' called';
 	}
     }
@@ -228,27 +239,127 @@ __END__
 
 =head1 NAME
 
-StackTrace - Perl extension for blah blah blah
+StackTrace - Stack trace and stack trace frame objects
 
 =head1 SYNOPSIS
 
   use StackTrace;
-  blah blah blah
+
+  my $trace = StackTrace->new;
+
+  print $trace->as_string; # like carp
+
+  # from top (most recent) of stack to bottom.
+  while (my $frame = $trace->next_frame)
+  {
+      print "Has args\n" if $f->hasargs;
+  }
+
+  # from bottom (least recent) of stack to top.
+  while (my $frame = $trace->prev_frame)
+  {
+      print "Sub: ", $f->subroutine, "\n";
+  }
 
 =head1 DESCRIPTION
 
-Stub documentation for StackTrace was created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+The StackTrace module contains two classes, StackTrace and
+StackTraceFrame.  The goal of this object is to encapsulate the
+information that can found through using the caller() function, as
+well as providing a simple interface to this data.
 
-Blah blah blah.
+The StackTrace object contains a set of StackTraceFrame objects, one
+for each level of the stack.  The frames contain all the data
+available from caller() as of Perl 5.00503.  There are changes in Perl
+5.6.0 that have yet to be incorporated.
+
+This code was created to support my L<Exception> class but may be
+useful in other contexts.
+
+=head1 StackTrace METHODS
+
+=over 4
+
+=item * new(%named_params)
+
+Returns a new StackTrace object.
+
+Allowed params are
+
+=item -- ignore_package => $package_name OR \@package_names
+
+Any frames where the package is one of these packages will not be on
+the stack.
+
+=item -- ignore_class => $package_name OR \@package_names
+
+Any frames where the package is a subclass of one of these packages
+(or is the same package) will not be on the stack.
+
+StackTrace internally adds itself to the 'ignore_package' parameter,
+meaning that the StackTrace package is B<ALWAYS> ignored.  However, if
+you create a subclass of StackTrace it will not be ignored.
+
+=item * next_frame
+
+Returns the next StackTraceFrame object down on the stack.  If it
+hasn't been called before it returns the first frame.  It returns
+undef when it reaches the bottom of the stack and then resets its
+pointer so the next call to next_frame or prev_frame will work
+properly.
+
+=item * prev_frame
+
+Returns the next StackTraceFrame object up on the stack.  If it hasn't
+been called before it returns the last frame.  It returns undef when
+it reaches the top of the stack and then resets its pointer so the
+next call to next_frame or prev_frame will work properly.
+
+=item * as_string
+
+Calls as_string on each frame from top to bottom, producing output
+quite similar to the Carp module's cluck/confess methods.
+
+=back
+
+=head1 StackTraceFrame METHODS
+
+See the L<caller> documentation for more information on what these
+methods return.
+
+=over 4
+
+=item * package
+
+=item * filename
+
+=item * line
+
+=item * subroutine
+
+=item * hasargs
+
+=item * wantarray
+
+=item * evaltext
+
+Returns undef if the frame was not part of an eval.
+
+=item * is_require
+
+Returns undef if the frame was not part of a require.
+
+=item * args
+
+Returns the arguments passed to the frame.  Note that any arguments
+that are references are returned without copying them.
 
 =head1 AUTHOR
 
-A. U. Thor, a.u.thor@a.galaxy.far.far.away
+Dave Rolsky, <autarch@urth.org>
 
 =head1 SEE ALSO
 
-perl(1).
+Exception
 
 =cut
