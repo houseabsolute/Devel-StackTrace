@@ -11,7 +11,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 1;
 
@@ -112,8 +112,7 @@ sub _ref_as_string
 
     if ( ref $_[0] &&
          ! $self->{respect_overload} &&
-         require overload &&
-         overload::Overloaded($_[0])
+         eval { overload::Overloaded($_[0]) }
        )
     {
         return overload::StrVal($_[0]);

@@ -4,7 +4,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 32;
+    my $tests = 33;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
@@ -239,6 +239,20 @@ if ( $Exception::Class::VERSION >= 1.09 )
     my $trace = respect_overloading($o);
 
     like( $trace->as_string, qr/\boverloaded\b/, 'overloading is ignored by default' );
+}
+
+{
+    package BlowOnCan;
+
+    sub can { die 'foo' }
+}
+
+{
+    my $o = bless {}, 'BlowOnCan';
+
+    my $trace = baz($o);
+
+    like( $trace->as_string, qr/BlowOnCan/, 'death in overload::Overloaded is ignored' );
 }
 
 

@@ -1,3 +1,10 @@
+1.09  Feb 26, 2004
+
+- The overload workaround blows up if a DBI handle is anywhere in the
+stack, because of a bad interaction between overload::Overloaded and
+DBI's custom dispatching.  This release works around that.
+
+
 1.08  Feb 23, 2004
 
 - Some tests failed on Win32 because they were hardcoded to expect a
