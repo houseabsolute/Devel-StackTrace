@@ -1,0 +1,13 @@
+.*CVS.*
+Makefile$
+\.\#.*
+~$
+MANIFEST.SKIP
+.*\.tar\.gz
+benchmarks
+_old.pm$
+.bak$
+blib/
+pm_to_blib
+\.o$
+test\.c
