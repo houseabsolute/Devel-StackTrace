@@ -179,7 +179,7 @@ EOF
 }
 
 # No ref to Exception::Class::Base object without refs
-if ( $Exception::Class::VERSION >= 1.09 )
+if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 {
     eval { Exception::Class::Base->throw( error => 'error',
                                           show_trace => 1,
