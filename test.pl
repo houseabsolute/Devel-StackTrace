@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..18\n"; }
+BEGIN { $| = 1; print "1..19\n"; }
 END {print "not ok 1\n" unless $main::loaded;}
 use Devel::StackTrace;
 use strict;
@@ -98,7 +98,7 @@ EOF
 	    "Trace should be:\n$trace_text but it's\n", $trace->as_string );
 }
 
-# 16-18 - frame_count, frame, reset_pointer methods
+# 16-18 - frame_count, frame, reset_pointer, frames methods
 {
     my $trace = foo();
 
@@ -116,6 +116,12 @@ EOF
     my $f = $trace->next_frame;
     result( $f->subroutine eq 'Devel::StackTrace::new',
 	    "next_frame should return first frame after call to reset_pointer\n" );
+
+    my @f = $trace->frames;
+    result( ( scalar @f == 4 ) &&
+	    ( $f[0]->subroutine eq 'Devel::StackTrace::new' ) &&
+	    ( $f[3]->subroutine eq 'main::foo' ),
+	    "frames method returned the wrong frames\n" );
 }
 
 sub result
