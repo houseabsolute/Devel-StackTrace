@@ -1,4 +1,11 @@
-0.9
+1.00  Aug 23, 2002 (from Taiwan)
+
+- Add an option to not store references to objects in stack frames.
+This can be important if you're expecting DESTROY to be called but a
+Devel::StackTraceFrame object is still holding a reference to your
+object(s).  Based on discussion with Tatsuhiko Miyagawa.
+
+0.9   Nov 24, 2001
 
 - Doc tweaks.
 
