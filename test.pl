@@ -9,12 +9,12 @@
 BEGIN { $| = 1; print "1..1\n"; }
 END {print "not ok 1\n" unless $main::loaded;}
 use StackTrace;
-use strict
+use strict;
 
 $^W = 1;
 $main::loaded = 1;
 
-result($loaded, "Unable to load StackTrace module\n");
+result( $main::loaded, "Unable to load StackTrace module\n");
 
 # 2-10 Test all accessors
 {
@@ -38,7 +38,7 @@ result($loaded, "Unable to load StackTrace module\n");
     result( $f[0]->filename eq 'test.pl', "First frame package should be test.pl but it's ",
 	    $f[0]->filename, "\n" );
 
-    result( $f[0]->line == 99, "First frame line should be 99 but it's ",
+    result( $f[0]->line == 112, "First frame line should be 112 but it's ",
 	    $f[0]->line, "\n" );
 
     result( $f[0]->subroutine eq 'StackTrace::new', "First frame subroutine should be StackTrace::new but it's ",
@@ -49,9 +49,9 @@ result($loaded, "Unable to load StackTrace module\n");
     result( $f[0]->wantarray == 0, "First frame wantarray should be false but it's not\n" );
 
     my $trace_text = <<'EOF';
-StackTrace::new called at test.pl line 99
-main::baz called at test.pl line 94
-main::bar called at test.pl line 89
+StackTrace::new called at test.pl line 112
+main::baz called at test.pl line 107
+main::bar called at test.pl line 102
 main::foo called at test.pl line 21
 EOF
 
@@ -84,6 +84,19 @@ EOF
 	    "The package for this frame should be main but it's ", $f[0]->package, "\n" );
 }
 
+{
+    my $trace = baz();
+
+    my $trace_text = <<'EOF';
+StackTrace::new called at test.pl line 112
+main::baz called at test.pl line 88
+EOF
+
+    my $t = "$trace";
+    result( $t eq $trace_text,
+	    "Trace should be:\n$trace_text but it's\n", $trace->as_string );
+}
+
 sub foo
 {
     bar(@_, 1);
@@ -96,7 +109,7 @@ sub bar
 
 sub baz
 {
-    StackTrace->new( @_[0,1] );
+    StackTrace->new( @_ ? @_[0,1] : () );
 }
 
 sub result
