@@ -1,22 +1,10 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl test.pl'
-
-######################### We start with some black magic to print on failure.
-
-# Change 1..1 below to 1..last_test_to_print .
-# (It may become useful if the test is moved to ./t subdirectory.)
-
-BEGIN { $| = 1; print "1..19\n"; }
-END {print "not ok 1\n" unless $main::loaded;}
-use Devel::StackTrace;
 use strict;
 
-$^W = 1;
-$main::loaded = 1;
+use Test::More tests => 24;
 
-result( $main::loaded, "Unable to load Devel::StackTrace module\n");
+BEGIN { use_ok('Devel::StackTrace') }
 
-# 2-10 - Test all accessors
+# Test all accessors
 {
     my $trace = foo();
 
@@ -24,42 +12,43 @@ result( $main::loaded, "Unable to load Devel::StackTrace module\n");
     while ( my $f = $trace->prev_frame ) { push @f, $f; }
 
     my $cnt = scalar @f;
-    result( $cnt == 4, "Trace should have 4 frames but it has $cnt\n" );
+    is( $cnt, 4,
+        "Trace should have 4 frames" );
 
     @f = ();
     while ( my $f = $trace->next_frame ) { push @f, $f; }
 
     $cnt = scalar @f;
-    result( $cnt == 4, "Trace should have 4 frames but it has $cnt\n" );
+    is( $cnt, 4,
+        "Trace should have 4 frames" );
 
-    result( $f[0]->package eq 'main', "First frame package should be main but it's ",
-	    $f[0]->package, "\n" );
+    is( $f[0]->package, 'main',
+        "First frame package should be main" );
 
-    result( $f[0]->filename eq 'test.pl', "First frame package should be test.pl but it's ",
-	    $f[0]->filename, "\n" );
+    is( $f[0]->filename, 'test.pl', "First frame filename should be test.pl" );
 
-    result( $f[0]->line == 1012, "First frame line should be 1012 but it's ",
-	    $f[0]->line, "\n" );
+    is( $f[0]->line, 1012, "First frame line should be 1012" );
 
-    result( $f[0]->subroutine eq 'Devel::StackTrace::new', "First frame subroutine should be Devel::StackTrace::new but it's ",
-	    $f[0]->subroutine, "\n" );
+    is( $f[0]->subroutine, 'Devel::StackTrace::new',
+        "First frame subroutine should be Devel::StackTrace::new" );
 
-    result( $f[0]->hasargs == 1, "First frame hasargs should be true but it's not\n" );
+    is( $f[0]->hasargs, 1, "First frame hasargs should be true" );
 
-    result( $f[0]->wantarray == 0, "First frame wantarray should be false but it's not\n" );
+    is( $f[0]->wantarray, 0,
+        "First frame wantarray should be false" );
 
     my $trace_text = <<'EOF';
 Trace begun at test.pl line 1012
 main::baz(1, 2) called at test.pl line 1007
 main::bar(1) called at test.pl line 1002
-main::foo at test.pl line 21
+main::foo at test.pl line 9
 EOF
 
-    result( $trace->as_string eq $trace_text,
-	    "Trace should be:\n$trace_text but it's\n", $trace->as_string );
+    is( $trace->as_string, $trace_text,
+        "Trace should be:\n$trace_text" );
 }
 
-# 11-14 - Test constructor params
+# Test constructor params
 {
     my $trace = SubTest::foo( ignore_class => 'Test' );
 
@@ -68,9 +57,10 @@ EOF
 
     my $cnt = scalar @f;
 
-    result( $cnt == 1, "Trace should have 1 frames but it has $cnt\n" );
-    result( $f[0]->package eq 'main',
-	    "The package for this frame should be main but it's ", $f[0]->package, "\n" );
+    is( $cnt, 1, "Trace should have 1 frame" );
+
+    is( $f[0]->package, 'main',
+        "The package for this frame should be main" );
 
     $trace = Test::foo( ignore_class => 'Test' );
 
@@ -79,9 +69,9 @@ EOF
 
     $cnt = scalar @f;
 
-    result( $cnt == 1, "Trace should have 1 frames but it has $cnt\n" );
-    result( $f[0]->package eq 'main',
-	    "The package for this frame should be main but it's ", $f[0]->package, "\n" );
+    is( $cnt, 1, "Trace should have 1 frame" );
+    is( $f[0]->package, 'main',
+        "The package for this frame should be main" );
 }
 
 # 15 - stringification overloading
@@ -90,47 +80,72 @@ EOF
 
     my $trace_text = <<'EOF';
 Trace begun at test.pl line 1012
-main::baz at test.pl line 89
+main::baz at test.pl line 79
 EOF
 
     my $t = "$trace";
-    result( $t eq $trace_text,
-	    "Trace should be:\n$trace_text but it's\n", $trace->as_string );
+    is( $t, $trace_text,
+        "Trace should be:\n$trace_text" );
 }
 
 # 16-18 - frame_count, frame, reset_pointer, frames methods
 {
     my $trace = foo();
 
-    result( $trace->frame_count == 4,
-	    "Trace should have 4 frames but it has ", $trace->frame_count, "\n" );
+    is( $trace->frame_count, 4,
+        "Trace should have 4 frames" );
 
     my $f = $trace->frame(2);
 
-    result( $f->subroutine eq 'main::bar',
-	    "Frame 2's subroutine should be 'main::bar' but it's ", $f->subroutine, "\n" );
+    is( $f->subroutine, 'main::bar',
+        "Frame 2's subroutine should be 'main::bar'" );
 
     $trace->next_frame; $trace->next_frame;
     $trace->reset_pointer;
 
     my $f = $trace->next_frame;
-    result( $f->subroutine eq 'Devel::StackTrace::new',
-	    "next_frame should return first frame after call to reset_pointer\n" );
+    is( $f->subroutine, 'Devel::StackTrace::new',
+        "next_frame should return first frame after call to reset_pointer" );
 
     my @f = $trace->frames;
-    result( ( scalar @f == 4 ) &&
-	    ( $f[0]->subroutine eq 'Devel::StackTrace::new' ) &&
-	    ( $f[3]->subroutine eq 'main::foo' ),
-	    "frames method returned the wrong frames\n" );
+    is( scalar @f, 4,
+        "frames method should return four frames" );
+
+    is( $f[0]->subroutine, 'Devel::StackTrace::new',
+        "first frame's subroutine should be Devel::StackTrace::new" );
+
+    is( $f[3]->subroutine, 'main::foo',
+        "last frame's subroutine should be main::foo" );
 }
 
-sub result
+# Storing references
 {
-    my $ok = !!shift;
-    use vars qw($TESTNUM);
-    $TESTNUM++;
-    print "not "x!$ok, "ok $TESTNUM\n";
-    print @_ if !$ok;
+    my $obj = RefTest->new;
+
+    my $trace = $obj->{trace};
+
+    my $call_to_trace = ($trace->frames)[1];
+
+    my @args = $call_to_trace->args;
+
+    is( scalar @args, 1,
+        "Only one argument should have been passed in the call to trace()" );
+
+    isa_ok( $args[0], 'RefTest' );
+}
+
+# Not storing references
+{
+    my $obj = RefTest2->new;
+
+    my $trace = $obj->{trace};
+
+    my $call_to_trace = ($trace->frames)[1];
+
+    my @args = $call_to_trace->args;
+
+    is( scalar @args, 0,
+        "No arguments should have been saved from the call to trace()" );
 }
 
 # This means I can move these lines down without constantly fiddling
@@ -178,3 +193,34 @@ sub trace
     Devel::StackTrace->new(@_);
 }
 
+package RefTest;
+
+sub new
+{
+    my $self = bless {}, shift;
+
+    $self->{trace} = trace($self);
+
+    return $self;
+}
+
+sub trace
+{
+    Devel::StackTrace->new();
+}
+
+package RefTest2;
+
+sub new
+{
+    my $self = bless {}, shift;
+
+    $self->{trace} = trace($self);
+
+    return $self;
+}
+
+sub trace
+{
+    Devel::StackTrace->new( no_object_refs => 1 );
+}
