@@ -5,8 +5,6 @@ use 5.005;
 use strict;
 use vars qw($VERSION);
 
-use fields qw( index frames );
-
 use overload
     '""' => \&as_string,
     fallback => 1;
@@ -20,14 +18,10 @@ sub new
     my $proto = shift;
     my $class = ref $proto || $proto;
 
-    my $self;
-    {
-	no strict 'refs';
-	$self = bless [ \%{"${class}::FIELDS"} ], $class;
-    }
+    my $self = { index => undef,
+		 frames => [],
+	       };
 
-    $self->{index} = undef;
-    $self->{frames} = [];
     $self->_add_frames(@_);
 
     return $self;
@@ -166,7 +160,8 @@ $VERSION = '0.5';
 BEGIN
 {
     no strict 'refs';
-    foreach my $f (keys %{__PACKAGE__.'::FIELDS'})
+    foreach my $f ( qw( package filename line subroutine hasargs
+                        wantarray evaltext is_require hints bitmask args ) )
     {
 	next if $f eq 'args';
 	*{$f} = sub { my Devel::StackTraceFrame $s = shift; return $s->{$f} };
@@ -180,17 +175,13 @@ sub new
     my $proto = shift;
     my $class = ref $proto || $proto;
 
-    my $self;
-    {
-	no strict 'refs';
-	$self = bless [ \%{"${class}::FIELDS"} ], $class;
-    }
+    my $self = bless {}, $class;
 
     my @fields = ( qw( package filename line subroutine hasargs wantarray evaltext is_require ) );
     push @fields, ( qw( hints bitmask ) ) if $] >= 5.006;
     @{ $self }{ @fields } = splice @_, 0, scalar @fields;
 
-    $self->{args} = \@_;
+    $self->{args} = [@_];
 
     return $self;
 }
