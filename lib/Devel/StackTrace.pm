@@ -54,7 +54,7 @@ sub _add_frames
 
     my $x = 0;
     my @c;
-    while ( do { package DB; @c = caller($x++) } )
+    while ( do { package DB; @DB::args = (); @c = caller($x++) } )
     {
 	# Do the quickest ones first.
 	next if $i_pack{ $c[0] };

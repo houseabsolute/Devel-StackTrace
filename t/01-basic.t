@@ -198,7 +198,7 @@ if ( $Exception::Class::VERSION >= 1.09 )
 
     my @args = $f->args;
 
-    is( scalar @args, 'no args given to eval block' );
+    is( scalar @args, 0, 'no args given to eval block' );
 }
 
 
