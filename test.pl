@@ -49,10 +49,10 @@ result( $main::loaded, "Unable to load StackTrace module\n");
     result( $f[0]->wantarray == 0, "First frame wantarray should be false but it's not\n" );
 
     my $trace_text = <<'EOF';
-StackTrace::new called at test.pl line 112
-main::baz called at test.pl line 107
-main::bar called at test.pl line 102
-main::foo called at test.pl line 21
+Trace begun at test.pl line 112
+main::baz(1, 2) called at test.pl line 107
+main::bar(1) called at test.pl line 102
+main::foo at test.pl line 21
 EOF
 
     result( $trace->as_string eq $trace_text,
@@ -88,8 +88,8 @@ EOF
     my $trace = baz();
 
     my $trace_text = <<'EOF';
-StackTrace::new called at test.pl line 112
-main::baz called at test.pl line 88
+Trace begun at test.pl line 112
+main::baz at test.pl line 88
 EOF
 
     my $t = "$trace";
