@@ -1,4 +1,4 @@
-package StackTrace;
+package Devel::StackTrace;
 
 use strict;
 use vars qw($VERSION);
@@ -9,7 +9,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '0.51';
+$VERSION = '0.6';
 
 1;
 
@@ -33,7 +33,7 @@ sub new
 
 sub _add_frames
 {
-    my StackTrace $self = shift;
+    my Devel::StackTrace $self = shift;
     my %p = @_;
 
     my (%i_pack, %i_class);
@@ -65,13 +65,13 @@ sub _add_frames
 	push @c, (undef, undef) if scalar @c == 6;
 
 	my @a = @DB::args;
-	push @{ $self->{frames} }, StackTraceFrame->new(@c, \@a);
+	push @{ $self->{frames} }, Devel::StackTraceFrame->new(@c, \@a);
     }
 }
 
 sub next_frame
 {
-    my StackTrace $self = shift;
+    my Devel::StackTrace $self = shift;
 
     # reset to top if necessary.
     $self->{index} = -1 unless defined $self->{index};
@@ -89,7 +89,7 @@ sub next_frame
 
 sub prev_frame
 {
-    my StackTrace $self = shift;
+    my Devel::StackTrace $self = shift;
 
     # reset to top if necessary.
     $self->{index} = scalar @{ $self->{frames} } unless defined $self->{index};
@@ -107,7 +107,7 @@ sub prev_frame
 
 sub as_string
 {
-    my StackTrace $self = shift;
+    my Devel::StackTrace $self = shift;
 
     my $st = '';
     my $first = 1;
@@ -120,22 +120,23 @@ sub as_string
     return $st;
 }
 
-package StackTraceFrame;
+package Devel::StackTraceFrame;
 
 use strict;
 use vars qw($VERSION);
 
 use fields qw( package filename line subroutine hasargs wantarray evaltext is_require args );
 
-$VERSION = '0.01';
+$VERSION = '0.5';
 
 # Create accessor routines
+BEGIN
 {
     no strict 'refs';
     foreach my $f (keys %{__PACKAGE__.'::FIELDS'})
     {
 	next if $f eq 'args';
-	*{$f} = sub { my StackTraceFrame $s = shift; return $s->{$f} };
+	*{$f} = sub { my Devel::StackTraceFrame $s = shift; return $s->{$f} };
     }
 }
 
@@ -159,14 +160,14 @@ sub new
 
 sub args
 {
-    my StackTraceFrame $self = shift;
+    my Devel::StackTraceFrame $self = shift;
 
     return @{ $self->{args} };
 }
 
 sub as_string
 {
-    my StackTraceFrame $self = shift;
+    my Devel::StackTraceFrame $self = shift;
     my $first = shift;
 
     my $sub = $self->subroutine;
@@ -239,13 +240,13 @@ __END__
 
 =head1 NAME
 
-StackTrace - Stack trace and stack trace frame objects
+Devel::StackTrace - Stack trace and stack trace frame objects
 
 =head1 SYNOPSIS
 
-  use StackTrace;
+  use Devel::StackTrace;
 
-  my $trace = StackTrace->new;
+  my $trace = Devel::StackTrace->new;
 
   print $trace->as_string; # like carp
 
@@ -263,28 +264,28 @@ StackTrace - Stack trace and stack trace frame objects
 
 =head1 DESCRIPTION
 
-The StackTrace module contains two classes, StackTrace and
-StackTraceFrame.  The goal of this object is to encapsulate the
-information that can found through using the caller() function, as
+The Devel::StackTrace module contains two classes, Devel::StackTrace
+and Devel::StackTraceFrame.  The goal of this object is to encapsulate
+the information that can found through using the caller() function, as
 well as providing a simple interface to this data.
 
-The StackTrace object contains a set of StackTraceFrame objects, one
-for each level of the stack.  The frames contain all the data
-available from caller() as of Perl 5.00503.  There are changes in Perl
-5.6.0 that have yet to be incorporated.
+The Devel::StackTrace object contains a set of Devel::StackTraceFrame
+objects, one for each level of the stack.  The frames contain all the
+data available from caller() as of Perl 5.00503.  There are changes in
+Perl 5.6.0 that have yet to be incorporated.
 
-This code was created to support my L<Exception> class but may be
-useful in other contexts.
+This code was created to support my L<Exception::Class::Base> class
+(part of Exception::Class) but may be useful in other contexts.
 
-=head1 StackTrace METHODS
+=head1 Devel::StackTrace METHODS
 
 =over 4
 
 =item * new(%named_params)
 
-Returns a new StackTrace object.
+Returns a new Devel::StackTrace object.
 
-Allowed params are
+Takes the following parameters:
 
 =item -- ignore_package => $package_name OR \@package_names
 
@@ -296,24 +297,25 @@ the stack.
 Any frames where the package is a subclass of one of these packages
 (or is the same package) will not be on the stack.
 
-StackTrace internally adds itself to the 'ignore_package' parameter,
-meaning that the StackTrace package is B<ALWAYS> ignored.  However, if
-you create a subclass of StackTrace it will not be ignored.
+Devel::StackTrace internally adds itself to the 'ignore_package' parameter,
+meaning that the Devel::StackTrace package is B<ALWAYS> ignored.  However, if
+you create a subclass of Devel::StackTrace it will not be ignored.
 
 =item * next_frame
 
-Returns the next StackTraceFrame object down on the stack.  If it
-hasn't been called before it returns the first frame.  It returns
+Returns the next Devel::StackTraceFrame object down on the stack.  If
+it hasn't been called before it returns the first frame.  It returns
 undef when it reaches the bottom of the stack and then resets its
-pointer so the next call to next_frame or prev_frame will work
+pointer so the next call to C<next_frame> or C<prev_frame> will work
 properly.
 
 =item * prev_frame
 
-Returns the next StackTraceFrame object up on the stack.  If it hasn't
-been called before it returns the last frame.  It returns undef when
-it reaches the top of the stack and then resets its pointer so the
-next call to next_frame or prev_frame will work properly.
+Returns the next Devel::StackTraceFrame object up on the stack.  If it
+hasn't been called before it returns the last frame.  It returns undef
+when it reaches the top of the stack and then resets its pointer so
+pointer so the next call to C<next_frame> or C<prev_frame> will work
+properly.
 
 =item * as_string
 
@@ -322,7 +324,7 @@ quite similar to the Carp module's cluck/confess methods.
 
 =back
 
-=head1 StackTraceFrame METHODS
+=head1 Devel::StackTraceFrame METHODS
 
 See the L<caller> documentation for more information on what these
 methods return.
@@ -352,7 +354,7 @@ Returns undef if the frame was not part of a require.
 =item * args
 
 Returns the arguments passed to the frame.  Note that any arguments
-that are references are returned without copying them.
+that are references are returned as references, not copies.
 
 =head1 AUTHOR
 
@@ -360,6 +362,6 @@ Dave Rolsky, <autarch@urth.org>
 
 =head1 SEE ALSO
 
-Exception
+Exception::Class
 
 =cut
