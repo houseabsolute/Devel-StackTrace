@@ -1,6 +1,6 @@
 use strict;
 
-use Test::More tests => 24;
+use Test::More tests => 25;
 
 BEGIN { use_ok('Devel::StackTrace') }
 
@@ -144,8 +144,11 @@ EOF
 
     my @args = $call_to_trace->args;
 
-    is( scalar @args, 0,
-        "No arguments should have been saved from the call to trace()" );
+    is( scalar @args, 1,
+        "Only one argument should have been passed in the call to trace()" );
+
+    is( $args[0], 'RefTest2 object',
+        "Actual object should be replaced by string 'RefTest2 object'" );
 }
 
 # This means I can move these lines down without constantly fiddling
