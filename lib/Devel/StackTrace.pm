@@ -110,6 +110,7 @@ sub _ref_as_string
 {
     my $self = shift;
 
+    local $@;
     if ( ref $_[0] &&
          ! $self->{respect_overload} &&
          eval { overload::Overloaded($_[0]) }
@@ -301,7 +302,8 @@ sub as_string
 		$_ = "undef", next unless defined $_;
 
                 # hack!
-                $_ = $self->Devel::StackTrace::_ref_as_string($_);
+                $_ = $self->Devel::StackTrace::_ref_as_string($_)
+                    if ref $_;
 
 		s/'/\\'/g;
 
