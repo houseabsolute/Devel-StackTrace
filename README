@@ -4,4 +4,6 @@ Devel::StackTrace, holds a number of Devel::StackTraceFrame objects
 can step through these frames forwards and backwards as you want or
 retrieve specific frames.
 
-NOTE: This modules requires Perl 5.005 or greater.
+NOTE: This module requires Perl 5.005 or greater.  Also, bugs in Perl
+5.6.0 will cause it to fail its test suite and it will probably be
+non-functional.  These bugs should be addressed in Perl 5.6.1.
