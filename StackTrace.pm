@@ -9,7 +9,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '0.6';
+$VERSION = '0.7';
 
 1;
 
@@ -103,6 +103,30 @@ sub prev_frame
 	$self->{index} = undef;
 	return undef;
     }
+}
+
+sub reset_pointer
+{
+    my Devel::StackTrace $self = shift;
+
+    $self->{index} = undef;
+}
+
+sub frame
+{
+    my Devel::StackTrace $self = shift;
+    my $i = shift;
+
+    return unless defined $i;
+
+    return $self->{frames}[$i];
+}
+
+sub frame_count
+{
+    my Devel::StackTrace $self = shift;
+
+    return scalar @{ $self->{frames} };
 }
 
 sub as_string
@@ -316,6 +340,22 @@ hasn't been called before it returns the last frame.  It returns undef
 when it reaches the top of the stack and then resets its pointer so
 pointer so the next call to C<next_frame> or C<prev_frame> will work
 properly.
+
+=item * reset_pointer
+
+Resets the pointer so that the next call C<next_frame> or
+C<prev_frame> will start at the top or bottom of the stack, as
+appropriate.
+
+=item * frame ($index)
+
+Given an index, returns the relevant frame or undef if there is not
+frame at that index.  The index is exactly like a Perl array.  The
+first frame is 0 and negative indexes are allowed.
+
+=item * frame_count
+
+Returns the number of frames in the trace object.
 
 =item * as_string
 
