@@ -1,3 +1,10 @@
+1.11  Apr 12, 2004
+
+- No code changes, just switching to including a Makefile.PL that uses
+ExtUtils::MakeMaker instead of one that sneakily uses Module::Build.
+Requested by Perrin Harkins.
+
+
 1.10  Mar 10, 2004
 
 - Silence a warning from the test code if Exception::Class isn't
