@@ -1,3 +1,15 @@
+1.10  Mar 10, 2004
+
+- Silence a warning from the test code if Exception::Class isn't
+installed.  Reported by Stefano Ruberti.
+
+- Localize $@ to avoid overwriting a previously set $@ while creating
+a Devel::StackTrace object.  This caused a test failure in the
+Exception::Class tests when run with Perl 5.6.1, but not with 5.8.3.
+I don't really know how to test for it outside of Exception::Class.
+Reported by Jesse Erlbaum.
+
+
 1.09  Feb 26, 2004
 
 - The overload workaround blows up if a DBI handle is anywhere in the
