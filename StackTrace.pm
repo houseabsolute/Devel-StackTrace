@@ -67,25 +67,26 @@ sub _add_frames
 
         if ( $p{no_refs} )
         {
-            @a = map { ( ref $_ ?
-                         ( UNIVERSAL::isa( $_, 'Exception::Class::Base' ) ?
-                           do { if ( $_->can('show_trace') )
-                                {
-                                    my $t = $_->show_trace;
-                                    $_->show_trace(0);
-                                    my $s = "$_";
-                                    $_->show_trace($t);
-                                    return $s;
-                                }
-                                else
-                                {
-                                    # hack but should work with older
-                                    # versions of E::C::B
-                                    return $_->{message};
-                                } } :
-                           "$_"
-                         ) :
-                         $_ ) } @a;
+            @a = map { ( ref $_
+                         ? ( UNIVERSAL::isa( $_, 'Exception::Class::Base' ) ?
+                             do { if ( $_->can('show_trace') )
+                                  {
+                                      my $t = $_->show_trace;
+                                      $_->show_trace(0);
+                                      my $s = "$_";
+                                      $_->show_trace($t);
+                                      return $s;
+                                  }
+                                  else
+                                  {
+                                      # hack but should work with older
+                                      # versions of E::C::B
+                                      return $_->{message};
+                                  } }
+                             : "$_"
+                         )
+                         : $_
+                       ) } @a;
         }
 
 	push @{ $self->{frames} }, Devel::StackTraceFrame->new(\@c, \@a);
