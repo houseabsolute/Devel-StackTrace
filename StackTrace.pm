@@ -111,9 +111,11 @@ sub as_string
     my StackTrace $self = shift;
 
     my $st = '';
+    my $first = 1;
     foreach my $f (@{ $self->{frames} })
     {
-	$st .= $f->as_string . "\n";
+	$st .= $f->as_string($first) . "\n";
+	$first = 0;
     }
 
     return $st;
@@ -158,8 +160,68 @@ sub new
 sub as_string
 {
     my StackTraceFrame $self = shift;
+    my $first = shift;
 
-    return $self->subroutine . ' called at ' . $self->filename . ' line ' . $self->line;
+    my $sub = $self->subroutine;
+    # This code stolen straight from Carp.pm and then tweaked.  All
+    # errors are probably my fault  -dave
+    if ($first)
+    {
+	$sub = 'Trace begun';
+    }
+    else
+    {
+	# Build a string, $sub, which names the sub-routine called.
+	# This may also be "require ...", "eval '...' or "eval {...}"
+	if (my $eval = $self->evaltext)
+	{
+	    if ($self->require)
+	    {
+		$sub = "require $eval";
+	    }
+	    else
+	    {
+		$eval =~ s/([\\\'])/\\$1/g;
+		$sub = "eval '$eval'";
+	    }
+	}
+	elsif ($sub eq '(eval)')
+	{
+	    $sub = 'eval {...}';
+	}
+
+	# if there are any arguments in the sub-routine call, format
+	# them according to the format variables defined earlier in
+	# this file and join them onto the $sub sub-routine string
+	if ( @{ $self->{args} } )
+	{
+	    for (@{ $self->{args} })
+	    {
+		# set args to the string "undef" if undefined
+		$_ = "undef", next unless defined $_;
+		if (ref $_)
+		{
+		    # dunno what this is for...
+		    $_ .= '';
+		}
+
+		s/'/\\'/g;
+
+		# 'quote' arg unless it looks like a number
+		$_ = "'$_'" unless /^-?[\d.]+$/;
+
+		# print high-end chars as 'M-<char>' or '^<char>'
+		s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
+		s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
+	    }
+
+	    # append ('all', 'the', 'arguments') to the $sub string
+	    $sub .= '(' . join(', ', @{ $self->{args} }) . ')';
+	    $sub .= ' called';
+	}
+    }
+
+    return "$sub at " . $self->filename . ' line ' . $self->line;
 }
 
 __END__
