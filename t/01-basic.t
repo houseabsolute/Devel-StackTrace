@@ -4,7 +4,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 27;
+    my $tests = 29;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
@@ -34,7 +34,7 @@ BEGIN
     is( $f[0]->package, 'main',
         "First frame package should be main" );
 
-    is( $f[0]->filename, 'test.pl', "First frame filename should be test.pl" );
+    is( $f[0]->filename, 't/01-basic.t', "First frame filename should be t/01-basic.t" );
 
     is( $f[0]->line, 1012, "First frame line should be 1012" );
 
@@ -47,10 +47,10 @@ BEGIN
         "First frame wantarray should be false" );
 
     my $trace_text = <<'EOF';
-Trace begun at test.pl line 1012
-main::baz(1, 2) called at test.pl line 1007
-main::bar(1) called at test.pl line 1002
-main::foo at test.pl line 18
+Trace begun at t/01-basic.t line 1012
+main::baz(1, 2) called at t/01-basic.t line 1007
+main::bar(1) called at t/01-basic.t line 1002
+main::foo at t/01-basic.t line 18
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
@@ -87,8 +87,8 @@ EOF
     my $trace = baz();
 
     my $trace_text = <<'EOF';
-Trace begun at test.pl line 1012
-main::baz at test.pl line 87
+Trace begun at t/01-basic.t line 1012
+main::baz at t/01-basic.t line 87
 EOF
 
     my $t = "$trace";
@@ -110,7 +110,7 @@ EOF
     $trace->next_frame; $trace->next_frame;
     $trace->reset_pointer;
 
-    my $f = $trace->next_frame;
+    $f = $trace->next_frame;
     is( $f->subroutine, 'Devel::StackTrace::new',
         "next_frame should return first frame after call to reset_pointer" );
 
@@ -192,8 +192,13 @@ if ( $Exception::Class::VERSION >= 1.09 )
 
     my $trace = eval { FooBar::some_sub('args') };
 
-    warn $trace->as_string;
+    my $f = ($trace->frames)[2];
 
+    is( $f->subroutine, '(eval)', 'subroutine is (eval)' );
+
+    my @args = $f->args;
+
+    is( scalar @args, 'no args given to eval block' );
 }
 
 
