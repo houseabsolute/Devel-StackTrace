@@ -63,11 +63,11 @@ sub _add_frames
 	next if $i_pack{ $c[0] };
 	next if ( grep { $c[0]->isa($_) } keys %i_class );
 
-	# eval and is_require are only returned when applicable.
+	# eval and is_require are only returned when applicable under 5.00503.
 	push @c, (undef, undef) if scalar @c == 6;
 
 	my @a = @DB::args;
-	push @{ $self->{frames} }, Devel::StackTraceFrame->new(@c, \@a);
+	push @{ $self->{frames} }, Devel::StackTraceFrame->new(@c, @a);
     }
 }
 
@@ -158,7 +158,7 @@ package Devel::StackTraceFrame;
 use strict;
 use vars qw($VERSION);
 
-use fields qw( package filename line subroutine hasargs wantarray evaltext is_require args );
+use fields qw( package filename line subroutine hasargs wantarray evaltext is_require hints bitmask args );
 
 $VERSION = '0.5';
 
@@ -186,7 +186,11 @@ sub new
 	$self = bless [ \%{"${class}::FIELDS"} ], $class;
     }
 
-    @{ $self }{ qw( package filename line subroutine hasargs wantarray evaltext is_require args ) } = @_;
+    my @fields = ( qw( package filename line subroutine hasargs wantarray evaltext is_require ) );
+    push @fields, ( qw( hints bitmask ) ) if $] >= 5.006;
+    @{ $self }{ @fields } = splice @_, 0, scalar @fields;
+
+    $self->{args} = \@_;
 
     return $self;
 }
