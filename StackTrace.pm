@@ -373,7 +373,8 @@ appropriate.
 
 =item * frames
 
-Returns a list of Devel::StackTraceFrame objects.  The order they are returned is from top (most
+Returns a list of Devel::StackTraceFrame objects.  The order they are
+returned is from top to bottom.
 
 =item * frame ($index)
 
