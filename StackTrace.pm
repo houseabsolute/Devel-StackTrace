@@ -48,8 +48,7 @@ sub _add_frames
 	$p{ignore_class} = [$p{ignore_class}] unless ref $p{ignore_class};
 	%i_class = map {$_ => 1} @{ $p{ignore_class} };
     }
-    # This _will_ cause all subclasses of this class to be ignored as
-    # well.
+
     my $p = __PACKAGE__;
     $i_pack{$p} = 1;
 
