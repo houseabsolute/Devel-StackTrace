@@ -1,3 +1,13 @@
+1.01  Sep 18, 2002
+
+- Change the "no object refs" feature to be a plain old "no refs"
+feature.  As was pointed out to me by Jean-Phillippe Bouchard, a plain
+reference (to an array, for example), can easily hold references to
+objects internally.  And since I'm not going to bother descending
+through nested data structures weeding out objects, this is an easier
+way to handle the problem.  Thanks to Jean-Phillippe Bouchard for a
+patch for this as well.
+
 1.00  Aug 23, 2002 (from Taiwan)
 
 - Add an option to not store references to objects in stack frames.
