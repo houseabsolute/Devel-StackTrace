@@ -5,7 +5,11 @@ use vars qw($VERSION);
 
 use fields qw( index frames );
 
-$VERSION = '0.01';
+use overload
+    '""' => \&as_string,
+    fallback => 1;
+
+$VERSION = '0.02';
 
 1;
 
