@@ -9,7 +9,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '0.1';
+$VERSION = '0.5';
 
 1;
 
@@ -182,7 +182,7 @@ sub as_string
 	# This may also be "require ...", "eval '...' or "eval {...}"
 	if (my $eval = $self->evaltext)
 	{
-	    if ($self->require)
+	    if ($self->is_require)
 	    {
 		$sub = "require $eval";
 	    }
