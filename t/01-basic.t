@@ -187,6 +187,16 @@ if ( $Exception::Class::VERSION >= 1.09 )
     ok( ! $@, 'create stacktrace with no refs and exception object on stack' );
 }
 
+{
+    sub FooBar::some_sub { return Devel::StackTrace->new }
+
+    my $trace = eval { FooBar::some_sub('args') };
+
+    warn $trace->as_string;
+
+}
+
+
 # This means I can move these lines down without constantly fiddling
 # with the checks for line numbers in the tests.
 

@@ -1,7 +1,7 @@
-README
-MANIFEST
+Changes
+lib/Devel/StackTrace.pm
 LICENSE
 Makefile.PL
-StackTrace.pm
-test.pl
-Changes
+MANIFEST			This list of files
+README
+t/01-basic.t
