@@ -1,0 +1,5 @@
+0.75
+
+- Added frames method (and docs for it).
+- Added 'use 5.005' which I should have put in there earlier.
+- DOCS: explanation of 'top' and 'bottom' as they refer to the stack.
