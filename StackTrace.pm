@@ -34,6 +34,8 @@ sub _add_frames
     my $self = shift;
     my %p = @_;
 
+    $p{no_refs} = delete $p{no_object_refs} if exists $p{no_object_refs};
+
     my (%i_pack, %i_class);
     if ($p{ignore_package})
     {
