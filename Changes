@@ -1,3 +1,9 @@
+1.04  Sep 25, 2003
+
+- The special handling of Exception::Class::Base objects was broken.
+This was exposed by the fact that Exception::Class 1.15 now uses
+Devel::StackTrace in a slightly different way than it did previously.
+
 1.03  Jan 22, 2003
 
 - Special handling of Exception::Class::Base objects when stringifying
