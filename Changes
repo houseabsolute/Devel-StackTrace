@@ -1,17 +1,26 @@
+1.05  Feb 17, 2004
+
+- Devel::StackTrace incorrectly reported that arguments were being
+passed to eval blocks (which isn't possible).  Reported by Mark Dedlow.
+
+
 1.04  Sep 25, 2003
 
 - The special handling of Exception::Class::Base objects was broken.
 This was exposed by the fact that Exception::Class 1.15 now uses
 Devel::StackTrace in a slightly different way than it did previously.
 
+
 1.03  Jan 22, 2003
 
 - Special handling of Exception::Class::Base objects when stringifying
 references.  This avoids infinite recursion between the two classes.
 
+
 1.02  Sep 19, 2002
 
 - Forgot to add Test::More to PREREQ_PM for previous releases.
+
 
 1.01  Sep 18, 2002
 
@@ -26,6 +35,7 @@ patch for this as well.
 The "no_object_refs" parameter is deprecated, and now does the same
 thing as the "no_refs" parameter.
 
+
 1.00  Aug 23, 2002 (from Taiwan)
 
 - Add an option to not store references to objects in stack frames.
@@ -33,9 +43,11 @@ This can be important if you're expecting DESTROY to be called but a
 Devel::StackTraceFrame object is still holding a reference to your
 object(s).  Based on discussion with Tatsuhiko Miyagawa.
 
+
 0.9   Nov 24, 2001
 
 - Doc tweaks.
+
 
 0.85
 
@@ -43,10 +55,12 @@ object(s).  Based on discussion with Tatsuhiko Miyagawa.
 under Perl 5.6.0
 - converted objects from pseudo-hashes to regular hashes.
 
+
 0.8
 
 - Should work under Perl 5.6.0+.
 - Added hints & bitmask methods for use under Perl 5.6.0.
+
 
 0.75
 
