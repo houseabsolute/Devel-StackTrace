@@ -9,7 +9,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '0.5';
+$VERSION = '0.51';
 
 1;
 
