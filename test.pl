@@ -8,13 +8,13 @@
 
 BEGIN { $| = 1; print "1..1\n"; }
 END {print "not ok 1\n" unless $main::loaded;}
-use StackTrace;
+use Devel::StackTrace;
 use strict;
 
 $^W = 1;
 $main::loaded = 1;
 
-result( $main::loaded, "Unable to load StackTrace module\n");
+result( $main::loaded, "Unable to load Devel::StackTrace module\n");
 
 # 2-10 Test all accessors
 {
@@ -41,7 +41,7 @@ result( $main::loaded, "Unable to load StackTrace module\n");
     result( $f[0]->line == 112, "First frame line should be 112 but it's ",
 	    $f[0]->line, "\n" );
 
-    result( $f[0]->subroutine eq 'StackTrace::new', "First frame subroutine should be StackTrace::new but it's ",
+    result( $f[0]->subroutine eq 'Devel::StackTrace::new', "First frame subroutine should be Devel::StackTrace::new but it's ",
 	    $f[0]->subroutine, "\n" );
 
     result( $f[0]->hasargs == 1, "First frame hasargs should be true but it's not\n" );
@@ -109,7 +109,7 @@ sub bar
 
 sub baz
 {
-    StackTrace->new( @_ ? @_[0,1] : () );
+    Devel::StackTrace->new( @_ ? @_[0,1] : () );
 }
 
 sub result
@@ -130,7 +130,7 @@ sub foo
 
 sub trace
 {
-    StackTrace->new(@_);
+    Devel::StackTrace->new(@_);
 }
 
 package SubTest;
@@ -144,6 +144,6 @@ sub foo
 
 sub trace
 {
-    StackTrace->new(@_);
+    Devel::StackTrace->new(@_);
 }
 
