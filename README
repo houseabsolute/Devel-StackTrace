@@ -11,5 +11,4 @@ BUGS
 There are bugs in the caller function under Perl 5.6.0 that this
 module may trigger.  One common symptom is an error message like
 'Bizarre copy of HASH' or 'Bizarre copy of ARRAY'.  There is no
-workaround.  A patch is in the Perl CVS and the 5.6.1 should fix this
-problem (thanks whoever made the patch :).
+workaround.  5.6.1 does not have this problem.
