@@ -5,6 +5,8 @@ use 5.005;
 use strict;
 use vars qw($VERSION);
 
+use fields qw( index frames );
+
 use overload
     '""' => \&as_string,
     fallback => 1;
@@ -18,9 +20,9 @@ sub new
     my $proto = shift;
     my $class = ref $proto || $proto;
 
-    my $self = { index => undef,
-		 frames => [],
-	       };
+    my $self = bless { index => undef,
+		       frames => [],
+		     }, $class;
 
     $self->_add_frames(@_);
 
@@ -29,7 +31,7 @@ sub new
 
 sub _add_frames
 {
-    my Devel::StackTrace $self = shift;
+    my $self = shift;
     my %p = @_;
 
     my (%i_pack, %i_class);
@@ -67,7 +69,7 @@ sub _add_frames
 
 sub next_frame
 {
-    my Devel::StackTrace $self = shift;
+    my $self = shift;
 
     # reset to top if necessary.
     $self->{index} = -1 unless defined $self->{index};
@@ -85,7 +87,7 @@ sub next_frame
 
 sub prev_frame
 {
-    my Devel::StackTrace $self = shift;
+    my $self = shift;
 
     # reset to top if necessary.
     $self->{index} = scalar @{ $self->{frames} } unless defined $self->{index};
@@ -103,21 +105,21 @@ sub prev_frame
 
 sub reset_pointer
 {
-    my Devel::StackTrace $self = shift;
+    my $self = shift;
 
     $self->{index} = undef;
 }
 
 sub frames
 {
-    my Devel::StackTrace $self = shift;
+    my $self = shift;
 
     return @{ $self->{frames} };
 }
 
 sub frame
 {
-    my Devel::StackTrace $self = shift;
+    my $self = shift;
     my $i = shift;
 
     return unless defined $i;
@@ -127,14 +129,14 @@ sub frame
 
 sub frame_count
 {
-    my Devel::StackTrace $self = shift;
+    my $self = shift;
 
     return scalar @{ $self->{frames} };
 }
 
 sub as_string
 {
-    my Devel::StackTrace $self = shift;
+    my $self = shift;
 
     my $st = '';
     my $first = 1;
@@ -164,7 +166,7 @@ BEGIN
                         wantarray evaltext is_require hints bitmask args ) )
     {
 	next if $f eq 'args';
-	*{$f} = sub { my Devel::StackTraceFrame $s = shift; return $s->{$f} };
+	*{$f} = sub { my $s = shift; return $s->{$f} };
     }
 }
 
@@ -181,21 +183,21 @@ sub new
     push @fields, ( qw( hints bitmask ) ) if $] >= 5.006;
     @{ $self }{ @fields } = splice @_, 0, scalar @fields;
 
-    $self->{args} = [@_];
+    $self->{args} = @_ ? [@_] : [];
 
     return $self;
 }
 
 sub args
 {
-    my Devel::StackTraceFrame $self = shift;
+    my $self = shift;
 
     return @{ $self->{args} };
 }
 
 sub as_string
 {
-    my Devel::StackTraceFrame $self = shift;
+    my $self = shift;
     my $first = shift;
 
     my $sub = $self->subroutine;
@@ -232,7 +234,7 @@ sub as_string
 	#
 	# We copy them because they're going to be modified.
 	#
-	if ( my @a = @{ $self->{args} } )
+	if ( my @a = $self->args )
 	{
 	    for (@a)
 	    {
@@ -420,16 +422,16 @@ Returns undef if the frame was not part of an eval.
 
 Returns undef if the frame was not part of a require.
 
+=item * args
+
+Returns the arguments passed to the frame.  Note that any arguments
+that are references are returned as references, not copies.
+
 =head2 Perl 5.6.0 and greater _ONLY_
 
 =item * hints
 
 =item * bitmask
-
-=item * args
-
-Returns the arguments passed to the frame.  Note that any arguments
-that are references are returned as references, not copies.
 
 =head1 AUTHOR
 
