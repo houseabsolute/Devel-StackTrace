@@ -1,3 +1,9 @@
+0.85
+
+- doc bug fix that made it seem like args method was only available
+under Perl 5.6.0
+- converted objects from pseudo-hashes to regular hashes.
+
 0.8
 
 - Should work under Perl 5.6.0+.
