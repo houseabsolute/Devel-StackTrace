@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..1\n"; }
+BEGIN { $| = 1; print "1..18\n"; }
 END {print "not ok 1\n" unless $main::loaded;}
 use Devel::StackTrace;
 use strict;
@@ -16,7 +16,7 @@ $main::loaded = 1;
 
 result( $main::loaded, "Unable to load Devel::StackTrace module\n");
 
-# 2-10 Test all accessors
+# 2-10 - Test all accessors
 {
     my $trace = foo();
 
@@ -38,7 +38,7 @@ result( $main::loaded, "Unable to load Devel::StackTrace module\n");
     result( $f[0]->filename eq 'test.pl', "First frame package should be test.pl but it's ",
 	    $f[0]->filename, "\n" );
 
-    result( $f[0]->line == 112, "First frame line should be 112 but it's ",
+    result( $f[0]->line == 1012, "First frame line should be 1012 but it's ",
 	    $f[0]->line, "\n" );
 
     result( $f[0]->subroutine eq 'Devel::StackTrace::new', "First frame subroutine should be Devel::StackTrace::new but it's ",
@@ -49,9 +49,9 @@ result( $main::loaded, "Unable to load Devel::StackTrace module\n");
     result( $f[0]->wantarray == 0, "First frame wantarray should be false but it's not\n" );
 
     my $trace_text = <<'EOF';
-Trace begun at test.pl line 112
-main::baz(1, 2) called at test.pl line 107
-main::bar(1) called at test.pl line 102
+Trace begun at test.pl line 1012
+main::baz(1, 2) called at test.pl line 1007
+main::bar(1) called at test.pl line 1002
 main::foo at test.pl line 21
 EOF
 
@@ -59,7 +59,7 @@ EOF
 	    "Trace should be:\n$trace_text but it's\n", $trace->as_string );
 }
 
-# 11-14 Test constructor params
+# 11-14 - Test constructor params
 {
     my $trace = SubTest::foo( ignore_class => 'Test' );
 
@@ -84,12 +84,13 @@ EOF
 	    "The package for this frame should be main but it's ", $f[0]->package, "\n" );
 }
 
+# 15 - stringification overloading
 {
     my $trace = baz();
 
     my $trace_text = <<'EOF';
-Trace begun at test.pl line 112
-main::baz at test.pl line 88
+Trace begun at test.pl line 1012
+main::baz at test.pl line 89
 EOF
 
     my $t = "$trace";
@@ -97,6 +98,39 @@ EOF
 	    "Trace should be:\n$trace_text but it's\n", $trace->as_string );
 }
 
+# 16-18 - frame_count, frame, reset_pointer methods
+{
+    my $trace = foo();
+
+    result( $trace->frame_count == 4,
+	    "Trace should have 4 frames but it has ", $trace->frame_count, "\n" );
+
+    my $f = $trace->frame(2);
+
+    result( $f->subroutine eq 'main::bar',
+	    "Frame 2's subroutine should be 'main::bar' but it's ", $f->subroutine, "\n" );
+
+    $trace->next_frame; $trace->next_frame;
+    $trace->reset_pointer;
+
+    my $f = $trace->next_frame;
+    result( $f->subroutine eq 'Devel::StackTrace::new',
+	    "next_frame should return first frame after call to reset_pointer\n" );
+}
+
+sub result
+{
+    my $ok = !!shift;
+    use vars qw($TESTNUM);
+    $TESTNUM++;
+    print "not "x!$ok, "ok $TESTNUM\n";
+    print @_ if !$ok;
+}
+
+# This means I can move these lines down without constantly fiddling
+# with the checks for line numbers in the tests.
+
+#line 1000
 sub foo
 {
     bar(@_, 1);
@@ -110,15 +144,6 @@ sub bar
 sub baz
 {
     Devel::StackTrace->new( @_ ? @_[0,1] : () );
-}
-
-sub result
-{
-    my $ok = !!shift;
-    use vars qw($TESTNUM);
-    $TESTNUM++;
-    print "not "x!$ok, "ok $TESTNUM\n";
-    print @_ if !$ok;
 }
 
 package Test;
