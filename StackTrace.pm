@@ -275,7 +275,7 @@ sub as_string
 		# 'quote' arg unless it looks like a number
 		$_ = "'$_'" unless /^-?[\d.]+$/;
 
-		# print high-end chars as 'M-<char>' or '^<char>'
+		# print control/high ASCII chars as 'M-<char>' or '^<char>'
 		s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
 		s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
 	    }
