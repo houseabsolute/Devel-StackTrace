@@ -57,13 +57,24 @@ sub _add_frames
     {
 	# Do the quickest ones first.
 	next if $i_pack{ $c[0] };
-	next if ( grep { $c[0]->isa($_) } keys %i_class );
+	next if grep { $c[0]->isa($_) } keys %i_class;
 
 	# eval and is_require are only returned when applicable under 5.00503.
 	push @c, (undef, undef) if scalar @c == 6;
 
 	my @a = @DB::args;
-	push @{ $self->{frames} }, Devel::StackTraceFrame->new(@c, @a);
+
+        if ( $p{no_object_refs} )
+        {
+            # All objects inherit from UNIVERSAL.  Plain references
+            # don't.
+            @a =
+                map { UNIVERSAL::isa( $_, 'UNIVERSAL' ) ?
+                      (ref $_) . ' object (D::V)' :
+                      $_ } @a;
+        }
+
+	push @{ $self->{frames} }, Devel::StackTraceFrame->new(\@c, \@a);
     }
 }
 
@@ -179,11 +190,13 @@ sub new
 
     my $self = bless {}, $class;
 
-    my @fields = ( qw( package filename line subroutine hasargs wantarray evaltext is_require ) );
+    my @fields =
+        ( qw( package filename line subroutine hasargs wantarray evaltext is_require ) );
     push @fields, ( qw( hints bitmask ) ) if $] >= 5.006;
-    @{ $self }{ @fields } = splice @_, 0, scalar @fields;
 
-    $self->{args} = @_ ? [@_] : [];
+    @{ $self }{ @fields } = @{$_[0]};
+
+    $self->{args} = $_[1] ? $_[1] : [];
 
     return $self;
 }
@@ -349,6 +362,20 @@ parameter, meaning that the Devel::StackTrace package is B<ALWAYS>
 ignored.  However, if you create a subclass of Devel::StackTrace it
 will not be ignored.
 
+=item -- no_object_refs => $boolean
+
+If this parameter is true, then Devel::StackTrace will not store
+objects internally when generataing stacktrace frames.  This lets your
+objects go out of scope.
+
+Devel::StackTrace replaces any objects arguments with a string like
+this:
+
+  (ref $object) . ' object (D::V)'
+
+So an object of the C<Widget> class would be represented as "Widget
+object (D::V)".
+
 =item * next_frame
 
 Returns the next Devel::StackTraceFrame object down on the stack.  If
@@ -374,7 +401,7 @@ appropriate.
 =item * frames
 
 Returns a list of Devel::StackTraceFrame objects.  The order they are
-returned is from top to bottom.
+returned is from top (most recent) to bottom.
 
 =item * frame ($index)
 
