@@ -373,12 +373,14 @@ Returns a new Devel::StackTrace object.
 
 Takes the following parameters:
 
-=item -- ignore_package => $package_name OR \@package_names
+=over 8
+
+=item * ignore_package => $package_name OR \@package_names
 
 Any frames where the package is one of these packages will not be on
 the stack.
 
-=item -- ignore_class => $package_name OR \@package_names
+=item * ignore_class => $package_name OR \@package_names
 
 Any frames where the package is a subclass of one of these packages
 (or is the same package) will not be on the stack.
@@ -388,7 +390,7 @@ parameter, meaning that the Devel::StackTrace package is B<ALWAYS>
 ignored.  However, if you create a subclass of Devel::StackTrace it
 will not be ignored.
 
-=item -- no_refs => $boolean
+=item * no_refs => $boolean
 
 If this parameter is true, then Devel::StackTrace will not store
 references internally when generating stacktrace frames.  This lets
@@ -396,6 +398,8 @@ your objects go out of scope.
 
 Devel::StackTrace replaces any references with their stringified
 representation.
+
+=back
 
 =item * next_frame
 
@@ -473,11 +477,17 @@ Returns undef if the frame was not part of a require.
 Returns the arguments passed to the frame.  Note that any arguments
 that are references are returned as references, not copies.
 
+=back
+
 =head2 These only contain data as of Perl 5.6.0 or later
+
+=over 4
 
 =item * hints
 
 =item * bitmask
+
+=back
 
 =head1 AUTHOR
 
