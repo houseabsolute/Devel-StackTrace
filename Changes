@@ -8,6 +8,9 @@ through nested data structures weeding out objects, this is an easier
 way to handle the problem.  Thanks to Jean-Phillippe Bouchard for a
 patch for this as well.
 
+The "no_object_refs" parameter is deprecated, and now does the same
+thing as the "no_refs" parameter.
+
 1.00  Aug 23, 2002 (from Taiwan)
 
 - Add an option to not store references to objects in stack frames.
