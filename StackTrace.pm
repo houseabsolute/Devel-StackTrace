@@ -11,7 +11,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 1;
 
@@ -68,7 +68,25 @@ sub _add_frames
 
         if ( $p{no_refs} )
         {
-            @a = map { ref $_ ? "$_" : $_ } @a;
+            @a = map { ( ref $_ ?
+                         ( UNIVERSAL::isa( $_, 'Exception::Class::Base' ) ?
+                           do { if ( $_->can('show_trace') )
+                                {
+                                    my $t = $_->show_trace;
+                                    $_->show_trace(0);
+                                    my $s = "$_";
+                                    $_->show_trace($t);
+                                    return $s;
+                                }
+                                else
+                                {
+                                    # hack but should work with older
+                                    # versions of E::C::B
+                                    return $_->{message};
+                                } } :
+                           "$_"
+                         ) :
+                         $_ ) } @a;
         }
 
 	push @{ $self->{frames} }, Devel::StackTraceFrame->new(\@c, \@a);
@@ -178,8 +196,6 @@ BEGIN
     }
 }
 
-1;
-
 sub new
 {
     my $proto = shift;
@@ -272,6 +288,9 @@ sub as_string
 
     return "$sub at " . $self->filename . ' line ' . $self->line;
 }
+
+1;
+
 
 __END__
 

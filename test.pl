@@ -1,8 +1,17 @@
 use strict;
 
-use Test::More tests => 27;
+use Test::More;
 
-BEGIN { use_ok('Devel::StackTrace') }
+BEGIN
+{
+    my $tests = 27;
+    eval { require Exception::Class };
+    $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
+
+    plan tests => $tests;
+
+    use_ok('Devel::StackTrace');
+}
 
 # Test all accessors
 {
@@ -41,11 +50,10 @@ BEGIN { use_ok('Devel::StackTrace') }
 Trace begun at test.pl line 1012
 main::baz(1, 2) called at test.pl line 1007
 main::bar(1) called at test.pl line 1002
-main::foo at test.pl line 9
+main::foo at test.pl line 18
 EOF
 
-    is( $trace->as_string, $trace_text,
-        "Trace should be:\n$trace_text" );
+    is( $trace->as_string, $trace_text, 'trace text' );
 }
 
 # Test constructor params
@@ -80,12 +88,11 @@ EOF
 
     my $trace_text = <<'EOF';
 Trace begun at test.pl line 1012
-main::baz at test.pl line 79
+main::baz at test.pl line 87
 EOF
 
     my $t = "$trace";
-    is( $t, $trace_text,
-        "Trace should be:\n$trace_text" );
+    is( $t, $trace_text, 'trace text' );
 }
 
 # 16-18 - frame_count, frame, reset_pointer, frames methods
@@ -168,6 +175,18 @@ EOF
         "Actual object should be replaced by string 'RefTest3=HASH'" );
 }
 
+# No ref to Exception::Class::Base object without refs
+if ( $Exception::Class::VERSION >= 1.09 )
+{
+    eval { Exception::Class::Base->throw( error => 'error',
+                                          show_trace => 1,
+                                        ) };
+    my $exc = $@;
+    eval { quux($exc) };
+
+    ok( ! $@, 'create stacktrace with no refs and exception object on stack' );
+}
+
 # This means I can move these lines down without constantly fiddling
 # with the checks for line numbers in the tests.
 
@@ -185,6 +204,11 @@ sub bar
 sub baz
 {
     Devel::StackTrace->new( @_ ? @_[0,1] : () );
+}
+
+sub quux
+{
+    Devel::StackTrace->new( no_refs => 1 );
 }
 
 package Test;
