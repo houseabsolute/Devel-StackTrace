@@ -13,8 +13,6 @@ use overload
 
 $VERSION = '1.10';
 
-1;
-
 sub new
 {
     my $class = shift;
