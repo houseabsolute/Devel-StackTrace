@@ -8,7 +8,7 @@ my $build =
                         requires    => { 'Test::More' => '0.46'
                                        },
                         sign        => 1,
-                        create_makefile_pl => 'passthrough',
+                        create_makefile_pl => 'traditional',
                       );
 
 $build->create_build_script;
