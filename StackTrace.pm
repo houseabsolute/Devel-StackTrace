@@ -11,7 +11,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '0.7';
+$VERSION = '0.8';
 
 1;
 
@@ -428,6 +428,12 @@ Returns undef if the frame was not part of an eval.
 =item * is_require
 
 Returns undef if the frame was not part of a require.
+
+=head2 Perl 5.6.0 and greater _ONLY_
+
+=item * hints
+
+=item * bitmask
 
 =item * args
 
