@@ -11,7 +11,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '0.75';
+$VERSION = '0.7';
 
 1;
 
@@ -350,9 +350,10 @@ the stack.
 Any frames where the package is a subclass of one of these packages
 (or is the same package) will not be on the stack.
 
-Devel::StackTrace internally adds itself to the 'ignore_package' parameter,
-meaning that the Devel::StackTrace package is B<ALWAYS> ignored.  However, if
-you create a subclass of Devel::StackTrace it will not be ignored.
+Devel::StackTrace internally adds itself to the 'ignore_package'
+parameter, meaning that the Devel::StackTrace package is B<ALWAYS>
+ignored.  However, if you create a subclass of Devel::StackTrace it
+will not be ignored.
 
 =item * next_frame
 
