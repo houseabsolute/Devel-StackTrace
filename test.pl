@@ -148,7 +148,7 @@ EOF
         "Only one argument should have been passed in the call to trace()" );
 
     is( $args[0], 'RefTest2 object',
-        "Actual object should be replaced by string 'RefTest2 object'" );
+        "Actual object should be replaced by string 'RefTest2 object (D::V)'" );
 }
 
 # This means I can move these lines down without constantly fiddling
