@@ -3,3 +3,5 @@ Devel::StackTrace, holds a number of Devel::StackTraceFrame objects
 (which have the same information as is returned from caller()).  You
 can step through these frames forwards and backwards as you want or
 retrieve specific frames.
+
+NOTE: This modules requires Perl 5.005 or greater.
