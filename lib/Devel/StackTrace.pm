@@ -5,13 +5,13 @@ use 5.005;
 use strict;
 use vars qw($VERSION);
 
-use fields qw( index frames );
+use File::Spec;
 
 use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub new
 {
@@ -210,8 +210,6 @@ package Devel::StackTraceFrame;
 use strict;
 use vars qw($VERSION);
 
-use fields qw( package filename line subroutine hasargs wantarray evaltext is_require hints bitmask args );
-
 $VERSION = '0.6';
 
 # Create accessor routines
@@ -238,6 +236,9 @@ sub new
     push @fields, ( qw( hints bitmask ) ) if $] >= 5.006;
 
     @{ $self }{ @fields } = @{$_[0]};
+
+    # fixup unix-style paths on win32
+    $self->{filename} = File::Spec->canonpath( $self->{filename} );
 
     $self->{args} = $_[1];
 

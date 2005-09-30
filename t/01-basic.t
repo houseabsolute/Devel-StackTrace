@@ -4,7 +4,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 33;
+    my $tests = 34;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
@@ -255,6 +255,17 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
     like( $trace->as_string, qr/BlowOnCan/, 'death in overload::Overloaded is ignored' );
 }
 
+
+SKIP:
+{
+    skip "Test only runs on Linux", 1
+        unless $^O eq 'linux';
+
+    my $frame = Devel::StackTraceFrame->new( [ 'Foo', 'foo/bar///baz.pm', 10, 'bar', 1, 1, '', 0 ],
+                                             [] );
+
+    is( $frame->filename, 'foo/bar/baz.pm', 'filename is canonicalized' );
+}
 
 # This means I can move these lines down without constantly fiddling
 # with the checks for line numbers in the tests.

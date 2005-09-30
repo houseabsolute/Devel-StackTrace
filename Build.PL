@@ -5,7 +5,8 @@ use Module::Build;
 my $build =
     Module::Build->new( module_name => 'Devel::StackTrace',
                         license     => 'perl',
-                        requires    => { 'Test::More' => '0.46'
+                        requires    => { 'Test::More' => '0.46',
+                                         'File::Spec' => 0,
                                        },
                         sign        => 1,
                         create_makefile_pl => 'traditional',

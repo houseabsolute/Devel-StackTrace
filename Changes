@@ -1,3 +1,12 @@
+1.12  Sep 30, 2005
+
+- Newer versions of Perl use Unix-style filenames when reporting the
+filename in caller(), which breaks Exception::Class tests on other
+platforms, and is just kind of funky.  This module now calls
+File::Spec->canonpath() to clean up the filename in each frame.
+Reported by Garret Goebel.
+
+
 1.11  Apr 12, 2004
 
 - No code changes, just switching to including a Makefile.PL that uses
