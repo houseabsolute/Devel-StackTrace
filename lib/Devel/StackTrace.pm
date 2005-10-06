@@ -19,9 +19,9 @@ sub new
     my %p = @_;
 
     my $self = bless { index => undef,
-		       frames => [],
+                       frames => [],
                        respect_overload => $p{respect_overload},
-		     }, $class;
+                     }, $class;
 
     $self->_add_frames(%p);
 
@@ -38,7 +38,7 @@ sub _add_frames
     my (@i_pack_re, %i_class);
     if ($p{ignore_package})
     {
-	$p{ignore_package} =
+        $p{ignore_package} =
             [$p{ignore_package}] unless UNIVERSAL::isa( $p{ignore_package}, 'ARRAY' );
 
         @i_pack_re = map { ref $_ ? $_ : qr/^\Q$_\E$/ } @{ $p{ignore_package} };
@@ -46,8 +46,8 @@ sub _add_frames
 
     if ($p{ignore_class})
     {
-	$p{ignore_class} = [$p{ignore_class}] unless ref $p{ignore_class};
-	%i_class = map {$_ => 1} @{ $p{ignore_class} };
+        $p{ignore_class} = [$p{ignore_class}] unless ref $p{ignore_class};
+        %i_class = map {$_ => 1} @{ $p{ignore_class} };
     }
 
     my $p = __PACKAGE__;
@@ -58,7 +58,7 @@ sub _add_frames
     while ( do { package DB; @DB::args = (); @c = caller($x++) } )
     {
         next if grep { $c[0] =~ /$_/ } @i_pack_re;
-	next if grep { $c[0]->isa($_) } keys %i_class;
+        next if grep { $c[0]->isa($_) } keys %i_class;
 
         $self->_add_frame( $p{no_refs}, \@c )
             if @c;
@@ -132,12 +132,12 @@ sub next_frame
 
     if (defined $self->{frames}[ $self->{index} + 1 ])
     {
-	return $self->{frames}[ ++$self->{index} ];
+        return $self->{frames}[ ++$self->{index} ];
     }
     else
     {
-	$self->{index} = undef;
-	return undef;
+        $self->{index} = undef;
+        return undef;
     }
 }
 
@@ -150,12 +150,12 @@ sub prev_frame
 
     if (defined $self->{frames}[ $self->{index} - 1 ] && $self->{index} >= 1)
     {
-	return $self->{frames}[ --$self->{index} ];
+        return $self->{frames}[ --$self->{index} ];
     }
     else
     {
-	$self->{index} = undef;
-	return undef;
+        $self->{index} = undef;
+        return undef;
     }
 }
 
@@ -198,8 +198,8 @@ sub as_string
     my $first = 1;
     foreach my $f (@{ $self->{frames} })
     {
-	$st .= $f->as_string($first) . "\n";
-	$first = 0;
+        $st .= $f->as_string($first) . "\n";
+        $first = 0;
     }
 
     return $st;
@@ -219,8 +219,8 @@ BEGIN
     foreach my $f ( qw( package filename line subroutine hasargs
                         wantarray evaltext is_require hints bitmask args ) )
     {
-	next if $f eq 'args';
-	*{$f} = sub { my $s = shift; return $s->{$f} };
+        next if $f eq 'args';
+        *{$f} = sub { my $s = shift; return $s->{$f} };
     }
 }
 
@@ -264,60 +264,60 @@ sub as_string
     # errors are probably my fault  -dave
     if ($first)
     {
-	$sub = 'Trace begun';
+        $sub = 'Trace begun';
     }
     else
     {
-	# Build a string, $sub, which names the sub-routine called.
-	# This may also be "require ...", "eval '...' or "eval {...}"
-	if (my $eval = $self->evaltext)
-	{
-	    if ($self->is_require)
-	    {
-		$sub = "require $eval";
-	    }
-	    else
-	    {
-		$eval =~ s/([\\\'])/\\$1/g;
-		$sub = "eval '$eval'";
-	    }
-	}
-	elsif ($sub eq '(eval)')
-	{
-	    $sub = 'eval {...}';
-	}
+        # Build a string, $sub, which names the sub-routine called.
+        # This may also be "require ...", "eval '...' or "eval {...}"
+        if (my $eval = $self->evaltext)
+        {
+            if ($self->is_require)
+            {
+                $sub = "require $eval";
+            }
+            else
+            {
+                $eval =~ s/([\\\'])/\\$1/g;
+                $sub = "eval '$eval'";
+            }
+        }
+        elsif ($sub eq '(eval)')
+        {
+            $sub = 'eval {...}';
+        }
 
-	# if there are any arguments in the sub-routine call, format
-	# them according to the format variables defined earlier in
-	# this file and join them onto the $sub sub-routine string
-	#
-	# We copy them because they're going to be modified.
-	#
-	if ( my @a = $self->args )
-	{
-	    for (@a)
-	    {
-		# set args to the string "undef" if undefined
-		$_ = "undef", next unless defined $_;
+        # if there are any arguments in the sub-routine call, format
+        # them according to the format variables defined earlier in
+        # this file and join them onto the $sub sub-routine string
+        #
+        # We copy them because they're going to be modified.
+        #
+        if ( my @a = $self->args )
+        {
+            for (@a)
+            {
+                # set args to the string "undef" if undefined
+                $_ = "undef", next unless defined $_;
 
                 # hack!
                 $_ = $self->Devel::StackTrace::_ref_as_string($_)
                     if ref $_;
 
-		s/'/\\'/g;
+                s/'/\\'/g;
 
-		# 'quote' arg unless it looks like a number
-		$_ = "'$_'" unless /^-?[\d.]+$/;
+                # 'quote' arg unless it looks like a number
+                $_ = "'$_'" unless /^-?[\d.]+$/;
 
-		# print control/high ASCII chars as 'M-<char>' or '^<char>'
-		s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
-		s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
-	    }
+                # print control/high ASCII chars as 'M-<char>' or '^<char>'
+                s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
+                s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
+            }
 
-	    # append ('all', 'the', 'arguments') to the $sub string
-	    $sub .= '(' . join(', ', @a) . ')';
-	    $sub .= ' called';
-	}
+            # append ('all', 'the', 'arguments') to the $sub string
+            $sub .= '(' . join(', ', @a) . ')';
+            $sub .= ' called';
+        }
     }
 
     return "$sub at " . $self->filename . ' line ' . $self->line;
