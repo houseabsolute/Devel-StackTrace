@@ -343,13 +343,13 @@ Devel::StackTrace - Stack trace and stack trace frame objects
   # from top (most recent) of stack to bottom.
   while (my $frame = $trace->next_frame)
   {
-      print "Has args\n" if $f->hasargs;
+      print "Has args\n" if $frame->hasargs;
   }
 
   # from bottom (least recent) of stack to top.
   while (my $frame = $trace->prev_frame)
   {
-      print "Sub: ", $f->subroutine, "\n";
+      print "Sub: ", $frame->subroutine, "\n";
   }
 
 =head1 DESCRIPTION
