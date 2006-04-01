@@ -13,7 +13,7 @@ BEGIN
     use_ok('Devel::StackTrace');
 }
 
-sub get_file_name { (caller(0))[1] }
+sub get_file_name { File::Spec->canonpath( (caller(0))[1] ) }
 my $test_file_name = get_file_name();
 
 # Test all accessors

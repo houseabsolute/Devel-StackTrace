@@ -1,3 +1,10 @@
+1.13
+
+- Add another fix for filename handling in the tests. Tests were
+giving false failures on Win32 because the tests needed to use
+File::Spec->canonpath(), just like Devel::StackTrace does internally.
+
+
 1.12  Sep 30, 2005
 
 - Newer versions of Perl use Unix-style filenames when reporting the
