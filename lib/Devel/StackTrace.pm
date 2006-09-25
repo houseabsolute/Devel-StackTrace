@@ -521,12 +521,23 @@ that are references are returned as references, not copies.
 
 =back
 
+=head1 SUPPORT
+
+Please submit bugs to the CPAN RT system at
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel%3A%3AStackTrace
+or via email at bug-devel-stacktrace@rt.cpan.org.
+
 =head1 AUTHOR
 
 Dave Rolsky, <autarch@urth.org>
 
-=head1 SEE ALSO
+=head1 COPYRIGHT
 
-Exception::Class
+Copyright (c) 2000-2006 David Rolsky.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included
+with this module.
 
 =cut
