@@ -11,7 +11,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub new
 {
@@ -54,8 +54,8 @@ sub _add_frames
     push @i_pack_re, qr/^\Q$p\E$/;
 
     my $x = 0;
-    my @c;
-    while ( do { package DB; @DB::args = (); @c = caller($x++) } )
+    while ( my @c =
+            do { package DB; @DB::args = (); caller($x++) } )
     {
         next if grep { $c[0] =~ /$_/ } @i_pack_re;
         next if grep { $c[0]->isa($_) } keys %i_class;
@@ -108,19 +108,9 @@ sub _ref_as_string
 {
     my $self = shift;
 
-    local $@;
-    if ( ref $_[0] &&
-         ! $self->{respect_overload} &&
-         eval { overload::Overloaded($_[0]) }
-       )
-    {
-        return overload::StrVal($_[0]);
-    }
-    else
-    {
-        # force stringification
-        $_[0] . '';
-    }
+    return overload::StrVal($_[0]) unless $self->{respect_overload};
+    # force stringification
+    return $_[0] . '';
 }
 
 sub next_frame
@@ -224,27 +214,29 @@ BEGIN
     }
 }
 
-sub new
 {
-    my $proto = shift;
-    my $class = ref $proto || $proto;
-
-    my $self = bless {}, $class;
-
     my @fields =
         ( qw( package filename line subroutine hasargs wantarray evaltext is_require ) );
     push @fields, ( qw( hints bitmask ) ) if $] >= 5.006;
 
-    @{ $self }{ @fields } = @{$_[0]};
+    sub new
+    {
+        my $proto = shift;
+        my $class = ref $proto || $proto;
 
-    # fixup unix-style paths on win32
-    $self->{filename} = File::Spec->canonpath( $self->{filename} );
+        my $self = bless {}, $class;
 
-    $self->{args} = $_[1];
+        @{ $self }{ @fields } = @{$_[0]};
 
-    $self->{respect_overload} = $_[2];
+        # fixup unix-style paths on win32
+        $self->{filename} = File::Spec->canonpath( $self->{filename} );
 
-    return $self;
+        $self->{args} = $_[1];
+
+        $self->{respect_overload} = $_[2];
+
+        return $self;
+    }
 }
 
 sub args
@@ -391,7 +383,7 @@ Here's an example:
 
 =over 4
 
-=item * new(%named_params)
+=item * Devel::StackTrace->new(%named_params)
 
 Returns a new Devel::StackTrace object.
 
@@ -433,7 +425,7 @@ traces, then set this parameter to true.
 
 =back
 
-=item * next_frame
+=item * $trace->next_frame
 
 Returns the next Devel::StackTraceFrame object down on the stack.  If
 it hasn't been called before it returns the first frame.  It returns
@@ -441,7 +433,7 @@ undef when it reaches the bottom of the stack and then resets its
 pointer so the next call to C<next_frame> or C<prev_frame> will work
 properly.
 
-=item * prev_frame
+=item * $trace->prev_frame
 
 Returns the next Devel::StackTraceFrame object up on the stack.  If it
 hasn't been called before it returns the last frame.  It returns undef
@@ -449,28 +441,28 @@ when it reaches the top of the stack and then resets its pointer so
 pointer so the next call to C<next_frame> or C<prev_frame> will work
 properly.
 
-=item * reset_pointer
+=item * $trace->reset_pointer
 
 Resets the pointer so that the next call C<next_frame> or
 C<prev_frame> will start at the top or bottom of the stack, as
 appropriate.
 
-=item * frames
+=item * $trace->frames
 
 Returns a list of Devel::StackTraceFrame objects.  The order they are
 returned is from top (most recent) to bottom.
 
-=item * frame ($index)
+=item * $trace->frame ($index)
 
 Given an index, returns the relevant frame or undef if there is not
 frame at that index.  The index is exactly like a Perl array.  The
 first frame is 0 and negative indexes are allowed.
 
-=item * frame_count
+=item * $trace->frame_count
 
 Returns the number of frames in the trace object.
 
-=item * as_string
+=item * $trace->as_string
 
 Calls as_string on each frame from top to bottom, producing output
 quite similar to the Carp module's cluck/confess methods.
@@ -484,27 +476,27 @@ methods return.
 
 =over 4
 
-=item * package
+=item * $frame->package
 
-=item * filename
+=item * $frame->filename
 
-=item * line
+=item * $frame->line
 
-=item * subroutine
+=item * $frame->subroutine
 
-=item * hasargs
+=item * $frame->hasargs
 
-=item * wantarray
+=item * $frame->wantarray
 
-=item * evaltext
+=item * $frame->evaltext
 
 Returns undef if the frame was not part of an eval.
 
-=item * is_require
+=item * $frame->is_require
 
 Returns undef if the frame was not part of a require.
 
-=item * args
+=item * $frame->args
 
 Returns the arguments passed to the frame.  Note that any arguments
 that are references are returned as references, not copies.
@@ -515,9 +507,9 @@ that are references are returned as references, not copies.
 
 =over 4
 
-=item * hints
+=item * $frame->hints
 
-=item * bitmask
+=item * $frame->bitmask
 
 =back
 
