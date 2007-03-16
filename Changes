@@ -1,82 +1,91 @@
+1.14  Mar 16, 2007
+
+- Added a few micro-optimizations from Ruslan Zakirov, who is hoping
+  this will ultimately help speed up RT.
+
+
 1.13  Apr 1, 2006
 
 - Add another fix for filename handling in the tests. Tests were
-giving false failures on Win32 because the tests needed to use
-File::Spec->canonpath(), just like Devel::StackTrace does internally.
+  giving false failures on Win32 because the tests needed to use
+  File::Spec->canonpath(), just like Devel::StackTrace does
+  internally.
 
 
 1.12  Sep 30, 2005
 
 - Newer versions of Perl use Unix-style filenames when reporting the
-filename in caller(), which breaks Exception::Class tests on other
-platforms, and is just kind of funky.  This module now calls
-File::Spec->canonpath() to clean up the filename in each frame.
-Reported by Garret Goebel.
+  filename in caller(), which breaks Exception::Class tests on other
+  platforms, and is just kind of funky.  This module now calls
+  File::Spec->canonpath() to clean up the filename in each frame.
+  Reported by Garret Goebel.
 
 
 1.11  Apr 12, 2004
 
 - No code changes, just switching to including a Makefile.PL that uses
-ExtUtils::MakeMaker instead of one that sneakily uses Module::Build.
-Requested by Perrin Harkins.
+  ExtUtils::MakeMaker instead of one that sneakily uses Module::Build.
+  Requested by Perrin Harkins.
 
 
 1.10  Mar 10, 2004
 
 - Silence a warning from the test code if Exception::Class isn't
-installed.  Reported by Stefano Ruberti.
+  installed.  Reported by Stefano Ruberti.
 
 - Localize $@ to avoid overwriting a previously set $@ while creating
-a Devel::StackTrace object.  This caused a test failure in the
-Exception::Class tests when run with Perl 5.6.1, but not with 5.8.3.
-I don't really know how to test for it outside of Exception::Class.
-Reported by Jesse Erlbaum.
+  a Devel::StackTrace object.  This caused a test failure in the
+  Exception::Class tests when run with Perl 5.6.1, but not with 5.8.3.
+  I don't really know how to test for it outside of Exception::Class.
+  Reported by Jesse Erlbaum.
 
 
 1.09  Feb 26, 2004
 
 - The overload workaround blows up if a DBI handle is anywhere in the
-stack, because of a bad interaction between overload::Overloaded and
-DBI's custom dispatching.  This release works around that.
+  stack, because of a bad interaction between overload::Overloaded and
+  DBI's custom dispatching.  This release works around that.
 
 
 1.08  Feb 23, 2004
 
 - Some tests failed on Win32 because they were hardcoded to expect a
-file name with forward slashes.  Reported by Steve Hay.
+  file name with forward slashes.  Reported by Steve Hay.
 
 
 1.07  Feb 21, 2004
 
 - This release includes a change to the overload handling that is
-necessary for cooperation with Exception::Class.
+  necessary for cooperation with Exception::Class.
 
 
 1.06  Feb 21, 2004
 
 - Devel::StackTrace now uses overload::StrVal() to get the underlying
-string value of an overloaded object when creating a stack frame for
-display.  This can be turned off by setting respect_overload to a true
-value.  Suggested by Matt Sisk.
+  string value of an overloaded object when creating a stack frame for
+  display.  This can be turned off by setting respect_overload to a
+  true value.  Suggested by Matt Sisk.
 
 
 1.05  Feb 17, 2004
 
 - Devel::StackTrace incorrectly reported that arguments were being
-passed to eval blocks (which isn't possible).  Reported by Mark Dedlow.
+  passed to eval blocks (which isn't possible).  Reported by Mark
+  Dedlow.
 
 
 1.04  Sep 25, 2003
 
 - The special handling of Exception::Class::Base objects was broken.
-This was exposed by the fact that Exception::Class 1.15 now uses
-Devel::StackTrace in a slightly different way than it did previously.
+  This was exposed by the fact that Exception::Class 1.15 now uses
+  Devel::StackTrace in a slightly different way than it did
+  previously.
 
 
 1.03  Jan 22, 2003
 
 - Special handling of Exception::Class::Base objects when stringifying
-references.  This avoids infinite recursion between the two classes.
+  references.  This avoids infinite recursion between the two classes.
 
 
 1.02  Sep 19, 2002
@@ -87,23 +96,23 @@ references.  This avoids infinite recursion between the two classes.
 1.01  Sep 18, 2002
 
 - Change the "no object refs" feature to be a plain old "no refs"
-feature.  As was pointed out to me by Jean-Phillippe Bouchard, a plain
-reference (to an array, for example), can easily hold references to
-objects internally.  And since I'm not going to bother descending
-through nested data structures weeding out objects, this is an easier
-way to handle the problem.  Thanks to Jean-Phillippe Bouchard for a
-patch for this as well.
+  feature.  As was pointed out to me by Jean-Phillippe Bouchard, a
+  plain reference (to an array, for example), can easily hold
+  references to objects internally.  And since I'm not going to bother
+  descending through nested data structures weeding out objects, this
+  is an easier way to handle the problem.  Thanks to Jean-Phillippe
+  Bouchard for a patch for this as well.
 
-The "no_object_refs" parameter is deprecated, and now does the same
-thing as the "no_refs" parameter.
+  The "no_object_refs" parameter is deprecated, and now does the same
+  thing as the "no_refs" parameter.
 
 
 1.00  Aug 23, 2002 (from Taiwan)
 
 - Add an option to not store references to objects in stack frames.
-This can be important if you're expecting DESTROY to be called but a
-Devel::StackTraceFrame object is still holding a reference to your
-object(s).  Based on discussion with Tatsuhiko Miyagawa.
+  This can be important if you're expecting DESTROY to be called but a
+  Devel::StackTraceFrame object is still holding a reference to your
+  object(s).  Based on discussion with Tatsuhiko Miyagawa.
 
 
 0.9   Nov 24, 2001
@@ -114,19 +123,23 @@ object(s).  Based on discussion with Tatsuhiko Miyagawa.
 0.85
 
 - doc bug fix that made it seem like args method was only available
-under Perl 5.6.0
+  under Perl 5.6.0
+
 - converted objects from pseudo-hashes to regular hashes.
 
 
 0.8
 
 - Should work under Perl 5.6.0+.
+
 - Added hints & bitmask methods for use under Perl 5.6.0.
 
 
 0.75
 
 - Added frames method (and docs for it).
+
 - Added 'use 5.005' which I should have put in there earlier.
+
 - DOCS: explanation of 'top' and 'bottom' as they refer to the stack.
 
