@@ -11,97 +11,123 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
+
 
 sub new
 {
     my $class = shift;
     my %p = @_;
 
-    my $self = bless { index => undef,
-                       frames => [],
-                       respect_overload => $p{respect_overload},
-                     }, $class;
+    # Backwards compatibility - this parameter was renamed to no_refs
+    # ages ago.
+    $p{no_refs} = delete $p{no_object_refs}
+        if exists $p{no_object_refs};
 
-    $self->_add_frames(%p);
+    my $self =
+        bless { index  => undef,
+                frames => [],
+                raw    => [],
+                %p,
+              }, $class;
+
+    $self->_record_caller_data();
 
     return $self;
 }
 
-sub _add_frames
+sub _record_caller_data
 {
     my $self = shift;
-    my %p = @_;
 
-    $p{no_refs} = delete $p{no_object_refs} if exists $p{no_object_refs};
+    # We exclude this method by starting one frame back.
+    my $x = 1;
+    while ( my @c =
+            do { package DB; @DB::args = (); caller($x++) } )
+    {
+        my @a = @DB::args;
+        push @{ $self->{raw} },
+            { caller => \@c,
+              args   => \@a,
+            };
+    }
+}
+
+sub _make_frames
+{
+    my $self = shift;
 
     my (@i_pack_re, %i_class);
-    if ($p{ignore_package})
+    if ( $self->{ignore_package} )
     {
-        $p{ignore_package} =
-            [$p{ignore_package}] unless UNIVERSAL::isa( $p{ignore_package}, 'ARRAY' );
+        $self->{ignore_package} =
+            [ $self->{ignore_package} ] unless UNIVERSAL::isa( $self->{ignore_package}, 'ARRAY' );
 
-        @i_pack_re = map { ref $_ ? $_ : qr/^\Q$_\E$/ } @{ $p{ignore_package} };
+        @i_pack_re = map { ref $_ ? $_ : qr/^\Q$_\E$/ } @{ $self->{ignore_package} };
     }
 
-    if ($p{ignore_class})
+    if ( $self->{ignore_class} )
     {
-        $p{ignore_class} = [$p{ignore_class}] unless ref $p{ignore_class};
-        %i_class = map {$_ => 1} @{ $p{ignore_class} };
+        $self->{ignore_class} = [ $self->{ignore_class} ] unless ref $self->{ignore_class};
+        %i_class = map {$_ => 1} @{ $self->{ignore_class} };
     }
 
     my $p = __PACKAGE__;
     push @i_pack_re, qr/^\Q$p\E$/;
 
-    my $x = 0;
-    while ( my @c =
-            do { package DB; @DB::args = (); caller($x++) } )
+    my $raw = delete $self->{raw};
+    for my $r ( @{$raw} )
     {
-        next if grep { $c[0] =~ /$_/ } @i_pack_re;
-        next if grep { $c[0]->isa($_) } keys %i_class;
+        next if grep { $r->{caller}[0] =~ /$_/ } @i_pack_re;
+        next if grep { $r->{caller}[0]->isa($_) } keys %i_class;
 
-        $self->_add_frame( $p{no_refs}, \@c )
-            if @c;
+        $self->_add_frame( $r->{caller}, $r->{args} );
     }
 }
 
 sub _add_frame
 {
     my $self = shift;
-    my $no_refs = shift;
-    my $c = shift;
+    my $c    = shift;
+    my $args = shift;
 
     # eval and is_require are only returned when applicable under 5.00503.
     push @$c, (undef, undef) if scalar @$c == 6;
 
-    my @a = @DB::args;
-
-    if ( $no_refs )
+    if ( $self->{no_refs} )
     {
-        @a = map { ( ref $_
-                     ? ( UNIVERSAL::isa( $_, 'Exception::Class::Base' ) ?
-                         do { if ( $_->can('show_trace') )
-                              {
-                                  my $t = $_->show_trace;
-                                  $_->show_trace(0);
-                                  my $s = "$_";
-                                  $_->show_trace($t);
-                                  $s;
-                              }
-                              else
-                              {
-                                  # hack but should work with older
-                                  # versions of E::C::B
-                                  $_->{message};
-                              } }
-                         : $self->_ref_as_string($_)
-                       )
-                     : $_
-                   ) } @a;
+        for ( grep { ref } @{$args} )
+        {
+            # I can't remember what this is about but I think
+            # it must be to avoid a loop between between
+            # Exception::Class and this module.
+            if ( UNIVERSAL::isa( $_, 'Exception::Class::Base' ) )
+            {
+                $_ = do { if ( $_->can('show_trace') )
+                          {
+                              my $t = $_->show_trace;
+                              $_->show_trace(0);
+                              my $s = "$_";
+                              $_->show_trace($t);
+                              $s;
+                          }
+                          else
+                          {
+                              # hack but should work with older
+                              # versions of E::C::B
+                              $_->{message};
+                          }
+                        };
+            }
+            else
+            {
+                $_  = $self->_ref_as_string($_);
+            }
+        }
     }
 
     push @{ $self->{frames} },
-        Devel::StackTraceFrame->new( $c, \@a, $self->{respect_overload} );
+        Devel::StackTraceFrame->new( $c, $args, $self->{respect_overload} );
 }
 
 sub _ref_as_string
@@ -120,9 +146,10 @@ sub next_frame
     # reset to top if necessary.
     $self->{index} = -1 unless defined $self->{index};
 
-    if (defined $self->{frames}[ $self->{index} + 1 ])
+    my @f = $self->frames();
+    if ( defined $f[ $self->{index} + 1 ] )
     {
-        return $self->{frames}[ ++$self->{index} ];
+        return $f[ ++$self->{index} ];
     }
     else
     {
@@ -135,12 +162,14 @@ sub prev_frame
 {
     my $self = shift;
 
-    # reset to top if necessary.
-    $self->{index} = scalar @{ $self->{frames} } unless defined $self->{index};
+    my @f = $self->frames();
 
-    if (defined $self->{frames}[ $self->{index} - 1 ] && $self->{index} >= 1)
+    # reset to top if necessary.
+    $self->{index} = scalar @f unless defined $self->{index};
+
+    if ( defined $f[ $self->{index} - 1 ] && $self->{index} >= 1 )
     {
-        return $self->{frames}[ --$self->{index} ];
+        return $f[ --$self->{index} ];
     }
     else
     {
@@ -160,6 +189,8 @@ sub frames
 {
     my $self = shift;
 
+    $self->_make_frames() if $self->{raw};
+
     return @{ $self->{frames} };
 }
 
@@ -170,14 +201,14 @@ sub frame
 
     return unless defined $i;
 
-    return $self->{frames}[$i];
+    return ( $self->frames() )[$i];
 }
 
 sub frame_count
 {
     my $self = shift;
 
-    return scalar @{ $self->{frames} };
+    return scalar ( $self->frames() );
 }
 
 sub as_string
@@ -186,7 +217,7 @@ sub as_string
 
     my $st = '';
     my $first = 1;
-    foreach my $f (@{ $self->{frames} })
+    foreach my $f ( $self->frames() )
     {
         $st .= $f->as_string($first) . "\n";
         $first = 0;

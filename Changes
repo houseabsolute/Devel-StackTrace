@@ -1,3 +1,20 @@
+1.15  Apr 28, 2007
+
+- Changed how objects are created in order to greatly speed up the
+  constructor. Instead of processing all the stack trace data when the
+  object is first created, this is delayed until it is needed. This
+  was done in order to help speed up Exception::Class. There are cases
+  where code may be throwing many exceptions but never examining the
+  stack traces.
+
+  Here is a representative benchmark of object construction for the
+  old code versus the new code:
+
+          Rate  old  new
+    old 1764/s   -- -76%
+    new 7353/s 317%   --
+
+
 1.14  Mar 16, 2007
 
 - Added a few micro-optimizations from Ruslan Zakirov, who is hoping
