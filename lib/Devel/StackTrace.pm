@@ -121,7 +121,7 @@ sub _add_frame
             }
             else
             {
-                $_  = $self->_ref_as_string($_);
+                $_ = $self->_ref_as_string($_);
             }
         }
     }
