@@ -46,7 +46,7 @@ my $test_file_name = get_file_name();
 
     is( $f[0]->hasargs, 1, "First frame hasargs should be true" );
 
-    is( $f[0]->wantarray, 0,
+    ok( ! $f[0]->wantarray,
         "First frame wantarray should be false" );
 
     my $trace_text = <<"EOF";
