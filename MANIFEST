@@ -7,5 +7,6 @@ MANIFEST			This list of files
 META.yml			Module meta-data (added by MakeMaker)
 README
 t/01-basic.t
+t/kwalitee.t
 t/pod-coverage.t
 t/pod.t
