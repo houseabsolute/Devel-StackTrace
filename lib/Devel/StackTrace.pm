@@ -11,8 +11,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.16';
-
+$VERSION = '1.17';
 
 sub new
 {
@@ -127,7 +126,8 @@ sub _add_frame
     }
 
     push @{ $self->{frames} },
-        Devel::StackTraceFrame->new( $c, $args, $self->{respect_overload} );
+        Devel::StackTraceFrame->new( $c, $args,
+                                     $self->{respect_overload}, $self->{max_arg_length} );
 }
 
 sub _ref_as_string
@@ -266,6 +266,8 @@ BEGIN
 
         $self->{respect_overload} = $_[2];
 
+        $self->{max_arg_length} = $_[3];
+
         return $self;
     }
 }
@@ -326,6 +328,12 @@ sub as_string
                 # hack!
                 $_ = $self->Devel::StackTrace::_ref_as_string($_)
                     if ref $_;
+
+                if ( $self->{max_arg_length}
+                     && length $_ > $self->{max_arg_length} )
+                {
+                    substr( $_, $self->{max_arg_length} ) = '...';
+                }
 
                 s/'/\\'/g;
 
@@ -453,6 +461,13 @@ the underlying string representation of an object, instead of
 respecting the object's stringification overloading.  If you would
 prefer to see the overloaded representation of objects in stack
 traces, then set this parameter to true.
+
+=item * max_arg_length => $integer
+
+By default, Devel::StackTrace will display the entire argument for
+each subroutine call. Setting this parameter causes it to truncate the
+argument's string representation if it is longer than this number of
+characters.
 
 =back
 

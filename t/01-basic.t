@@ -4,7 +4,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 34;
+    my $tests = 35;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
@@ -256,6 +256,17 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 }
 
 
+{
+    my $trace = max_arg_length('abcdefghijklmnop');
+
+    my $trace_text = <<"EOF";
+Trace begun at $test_file_name line 1027
+main::max_arg_length('abcdefghij...') called at t/01-basic.t line 260
+EOF
+
+    is( $trace->as_string, $trace_text, 'trace text' );
+}
+
 SKIP:
 {
     skip "Test only runs on Linux", 1
@@ -296,6 +307,10 @@ sub respect_overloading
     Devel::StackTrace->new( respect_overload => 1 );
 }
 
+sub max_arg_length
+{
+    Devel::StackTrace->new( max_arg_length => 10 );
+}
 
 package Test;
 

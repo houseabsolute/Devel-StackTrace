@@ -1,3 +1,10 @@
+1.17  Mar 30, 2008
+
+- Added a max_arg_length parameter, which if set causes
+  Devel::StackTrace to truncate long strings when printing out a
+  frame. RT #33519. Patch by Ian Burrell. 
+
+
 1.16  Feb 2, 2008
 
 - A test fix for bleadperl. The value of wantarray from caller() needs
