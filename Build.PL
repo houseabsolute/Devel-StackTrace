@@ -10,6 +10,7 @@ my $build =
                                        },
                         sign        => 1,
                         create_makefile_pl => 'traditional',
+                        create_readme      => 1,
                       );
 
 $build->create_build_script;
