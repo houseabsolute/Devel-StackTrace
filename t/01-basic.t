@@ -261,7 +261,7 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1027
-main::max_arg_length('abcdefghij...') called at t/01-basic.t line 260
+main::max_arg_length('abcdefghij...') called at $test_file_name line 260
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );

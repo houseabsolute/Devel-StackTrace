@@ -1,3 +1,8 @@
+1.18  Mar 31, 2008
+
+- Fix a test failure on Win32. No changes to the non-test code.
+
+
 1.17  Mar 30, 2008
 
 - Added a max_arg_length parameter, which if set causes
