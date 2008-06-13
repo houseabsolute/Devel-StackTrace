@@ -250,8 +250,8 @@ BEGIN
 
 {
     my @fields =
-        ( qw( package filename line subroutine hasargs wantarray evaltext is_require ) );
-    push @fields, ( qw( hints bitmask ) ) if $] >= 5.006;
+        ( qw( package filename line subroutine hasargs wantarray
+              evaltext is_require hints bitmask ) );
 
     sub new
     {
@@ -403,8 +403,7 @@ well as providing a simple interface to this data.
 
 The Devel::StackTrace object contains a set of Devel::StackTraceFrame
 objects, one for each level of the stack.  The frames contain all the
-data available from caller() as of Perl 5.6.0 though this module still
-works with 5.00503.
+data available from C<caller()>.
 
 This code was created to support my L<Exception::Class::Base> class
 (part of Exception::Class) but may be useful in other contexts.
@@ -557,12 +556,6 @@ Returns undef if the frame was not part of a require.
 
 Returns the arguments passed to the frame.  Note that any arguments
 that are references are returned as references, not copies.
-
-=back
-
-=head2 These only contain data as of Perl 5.6.0 or later
-
-=over 4
 
 =item * $frame->hints
 
