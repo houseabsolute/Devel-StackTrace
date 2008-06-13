@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 
 use Test::More;
 
@@ -53,7 +54,7 @@ my $test_file_name = get_file_name();
 Trace begun at $test_file_name line 1012
 main::baz(1, 2) called at $test_file_name line 1007
 main::bar(1) called at $test_file_name line 1002
-main::foo at $test_file_name line 21
+main::foo at $test_file_name line 22
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
@@ -91,7 +92,7 @@ EOF
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1012
-main::baz at $test_file_name line 90
+main::baz at $test_file_name line 91
 EOF
 
     my $t = "$trace";
@@ -261,7 +262,7 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1027
-main::max_arg_length('abcdefghij...') called at $test_file_name line 260
+main::max_arg_length('abcdefghij...') called at $test_file_name line 261
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );

@@ -1,4 +1,7 @@
+use 5.006;
+
 use strict;
+use warnings;
 
 use Module::Build;
 
@@ -7,6 +10,7 @@ my $build =
                         license     => 'perl',
                         requires    => { 'Test::More' => '0.46',
                                          'File::Spec' => 0,
+                                         'perl'       => 5.006,
                                        },
                         sign        => 1,
                         create_makefile_pl => 'traditional',

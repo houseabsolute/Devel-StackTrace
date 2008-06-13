@@ -1,9 +1,9 @@
 package Devel::StackTrace;
 
-use 5.005;
+use 5.006;
 
 use strict;
-use vars qw($VERSION);
+use warnings;
 
 use File::Spec;
 
@@ -11,7 +11,8 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-$VERSION = '1.18';
+our $VERSION = 1.19;
+
 
 sub new
 {
@@ -226,12 +227,14 @@ sub as_string
     return $st;
 }
 
-package Devel::StackTraceFrame;
+# Hide from PAUSE
+package
+    Devel::StackTraceFrame;
 
 use strict;
-use vars qw($VERSION);
+use warnings;
 
-$VERSION = '0.6';
+our $VERSION = $Devel::StackTrace::VERSION;
 
 # Create accessor routines
 BEGIN
@@ -329,20 +332,28 @@ sub as_string
                 $_ = $self->Devel::StackTrace::_ref_as_string($_)
                     if ref $_;
 
-                if ( $self->{max_arg_length}
-                     && length $_ > $self->{max_arg_length} )
+                eval
                 {
-                    substr( $_, $self->{max_arg_length} ) = '...';
+                    if ( $self->{max_arg_length}
+                         && length $_ > $self->{max_arg_length} )
+                    {
+                        substr( $_, $self->{max_arg_length} ) = '...';
+                    }
+
+                    s/'/\\'/g;
+
+                    # 'quote' arg unless it looks like a number
+                    $_ = "'$_'" unless /^-?[\d.]+$/;
+
+                    # print control/high ASCII chars as 'M-<char>' or '^<char>'
+                    s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
+                    s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
+                };
+
+                if ( my $e = $@ )
+                {
+                    $_ = $e =~ /malformed utf-8/i ? '(bad utf-8)' : '?';
                 }
-
-                s/'/\\'/g;
-
-                # 'quote' arg unless it looks like a number
-                $_ = "'$_'" unless /^-?[\d.]+$/;
-
-                # print control/high ASCII chars as 'M-<char>' or '^<char>'
-                s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
-                s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
             }
 
             # append ('all', 'the', 'arguments') to the $sub string

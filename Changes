@@ -1,3 +1,14 @@
+1.19  Jun 13, 2008
+
+- Dropped support for Perl 5.005.
+
+- If a function was in stack trace had been called with invalid utf-8
+  bytes, this could cause stringifying a stack trace to blow up when
+  it tried to stringify that argument. We now catch those (and other)
+  errors and simply put "(bad utf-8)" or "?" in the stringified
+  argument list. Reported by Alex Vandiver.
+
+
 1.18  Mar 31, 2008
 
 - Fix a test failure on Win32. No changes to the non-test code.
