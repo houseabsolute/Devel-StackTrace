@@ -1,3 +1,12 @@
+1.1901  Jun 13, 2008
+
+- This release just contains a test fix.
+
+- The new tests for bad utf-8 fail with Perl 5.8.x where x <=
+  6. Apparently, utf-8 was just more broken back then. Reported by
+  Andreas Koenig's smokebots.
+
+
 1.19  Jun 13, 2008
 
 - Dropped support for Perl 5.005.
