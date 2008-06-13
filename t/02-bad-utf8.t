@@ -7,6 +7,9 @@ eval 'use Encode';
 plan skip_all => 'These tests require Encode.pm'
     unless eval 'use Encode; 1';
 
+plan skip_all => 'These tests require Perl 5.8.7+'
+    unless $] >= 5.008007;
+
 plan tests => 2;
 
 use Devel::StackTrace;
