@@ -1,3 +1,11 @@
+1.1902  Jul 16, 2008
+
+- This release just contains another test fix.
+
+- The new tests for bad utf-8 apparently fail with any Perl before
+  5.8.8.
+
+
 1.1901  Jun 13, 2008
 
 - This release just contains a test fix.

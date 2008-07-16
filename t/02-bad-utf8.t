@@ -7,8 +7,8 @@ eval 'use Encode';
 plan skip_all => 'These tests require Encode.pm'
     unless eval 'use Encode; 1';
 
-plan skip_all => 'These tests require Perl 5.8.7+'
-    unless $] >= 5.008007;
+plan skip_all => 'These tests require Perl 5.8.8+'
+    unless $] >= 5.008008;
 
 plan tests => 2;
 
