@@ -3,7 +3,7 @@
 - This release just contains another test fix.
 
 - The new tests for bad utf-8 apparently fail with any Perl before
-  5.8.8.
+  5.8.8. Reported by Lee Heagney. RT #37702.
 
 
 1.1901  Jun 13, 2008
