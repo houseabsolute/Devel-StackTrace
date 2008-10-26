@@ -8,9 +8,10 @@ use Module::Build;
 my $build =
     Module::Build->new( module_name => 'Devel::StackTrace',
                         license     => 'perl',
-                        requires    => { 'Test::More' => '0.46',
-                                         'File::Spec' => 0,
-                                         'perl'       => 5.006,
+                        requires    => { 'File::Spec'   => '0',
+                                         'Scalar::Util' => '0',
+                                         'Test::More'   => '0.46',
+                                         'perl'         => '5.006',
                                        },
                         sign        => 1,
                         create_makefile_pl => 'traditional',

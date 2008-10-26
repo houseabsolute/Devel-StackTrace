@@ -1,3 +1,13 @@
+1.20  Oct 25, 2008
+
+- The change in 1.15 to object creation broke the no_refs feature,
+  causing references to be stored until the trace's frame objects were
+  created.
+
+* Exception::Class objects are always stringified by calling
+  overload::StrVal().
+
+
 1.1902  Jul 16, 2008
 
 - This release just contains another test fix.

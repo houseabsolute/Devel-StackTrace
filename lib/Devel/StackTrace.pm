@@ -6,12 +6,13 @@ use strict;
 use warnings;
 
 use File::Spec;
+use Scalar::Util qw( blessed );
 
 use overload
     '""' => \&as_string,
     fallback => 1;
 
-our $VERSION = '1.1902';
+our $VERSION = '1.20';
 
 
 sub new
@@ -46,10 +47,51 @@ sub _record_caller_data
             do { package DB; @DB::args = (); caller($x++) } )
     {
         my @a = @DB::args;
+
+        if ( $self->{no_refs} ) {
+            @a = map { ref $_ ? $self->_ref_to_string($_) : $_ } @a;
+        }
+
         push @{ $self->{raw} },
             { caller => \@c,
               args   => \@a,
             };
+    }
+}
+
+sub _ref_to_string
+{
+    my $self = shift;
+    my $ref  = shift;
+
+    return overload::StrVal($ref)
+        if blessed $ref && $ref->isa('Exception::Class::Base');
+
+    return overload::StrVal($ref) unless $self->{respect_overload};
+    # force stringification and let overloading do its thing
+    return $ref . '';
+}
+
+sub _ecb_hack
+{
+    my $self = shift;
+    my $ref  = shift;
+
+    # This avoids a loop between Exception::Class::Base and this module
+    if ( $ref->can('show_trace') )
+    {
+        my $t = $ref->show_trace;
+        $ref->show_trace(0);
+        my $s = "$ref";
+        $ref->show_trace($t);
+
+        return $s;
+    }
+    else
+    {
+        # hack but should work with older
+        # versions of E::C::B
+        return $ref->{message};
     }
 }
 
@@ -96,48 +138,11 @@ sub _add_frame
 
     if ( $self->{no_refs} )
     {
-        for ( grep { ref } @{$args} )
-        {
-            # I can't remember what this is about but I think
-            # it must be to avoid a loop between between
-            # Exception::Class and this module.
-            if ( UNIVERSAL::isa( $_, 'Exception::Class::Base' ) )
-            {
-                $_ = do { if ( $_->can('show_trace') )
-                          {
-                              my $t = $_->show_trace;
-                              $_->show_trace(0);
-                              my $s = "$_";
-                              $_->show_trace($t);
-                              $s;
-                          }
-                          else
-                          {
-                              # hack but should work with older
-                              # versions of E::C::B
-                              $_->{message};
-                          }
-                        };
-            }
-            else
-            {
-                $_ = $self->_ref_as_string($_);
-            }
-        }
     }
 
     push @{ $self->{frames} },
         Devel::StackTraceFrame->new( $c, $args,
                                      $self->{respect_overload}, $self->{max_arg_length} );
-}
-
-sub _ref_as_string
-{
-    my $self = shift;
-
-    return overload::StrVal($_[0]) unless $self->{respect_overload};
-    # force stringification
-    return $_[0] . '';
 }
 
 sub next_frame
@@ -329,7 +334,7 @@ sub as_string
                 $_ = "undef", next unless defined $_;
 
                 # hack!
-                $_ = $self->Devel::StackTrace::_ref_as_string($_)
+                $_ = $self->Devel::StackTrace::_ref_to_string($_)
                     if ref $_;
 
                 eval

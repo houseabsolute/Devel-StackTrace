@@ -5,7 +5,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 35;
+    my $tests = 37;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
@@ -279,6 +279,18 @@ SKIP:
     is( $frame->filename, 'foo/bar/baz.pm', 'filename is canonicalized' );
 }
 
+{
+    my $obj = RefTest4->new();
+
+    my $trace = $obj->{trace};
+
+    ok( ( ! grep { ref $_ } map { @{ $_->{args} } } @{ $trace->{raw} } ),
+        'raw data does not contain any references when no_refs is true' );
+
+    is( $trace->{raw}[1]{args}[1], 'not a ref',
+        'non-refs are preserved properly in raw data as well' );
+}
+
 # This means I can move these lines down without constantly fiddling
 # with the checks for line numbers in the tests.
 
@@ -385,4 +397,20 @@ sub new
 sub trace
 {
     Devel::StackTrace->new( no_object_refs => 1 );
+}
+
+package RefTest4;
+
+sub new
+{
+    my $self = bless {}, shift;
+
+    $self->{trace} = trace( $self, 'not a ref' );
+
+    return $self;
+}
+
+sub trace
+{
+    Devel::StackTrace->new( no_refs => 1 );
 }
