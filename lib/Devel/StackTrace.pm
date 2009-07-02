@@ -77,29 +77,6 @@ sub _ref_to_string
     return $@ ? overload::StrVal($ref) : $str;
 }
 
-sub _ecb_hack
-{
-    my $self = shift;
-    my $ref  = shift;
-
-    # This avoids a loop between Exception::Class::Base and this module
-    if ( $ref->can('show_trace') )
-    {
-        my $t = $ref->show_trace;
-        $ref->show_trace(0);
-        my $s = "$ref";
-        $ref->show_trace($t);
-
-        return $s;
-    }
-    else
-    {
-        # hack but should work with older
-        # versions of E::C::B
-        return $ref->{message};
-    }
-}
-
 sub _make_frames
 {
     my $self = shift;
