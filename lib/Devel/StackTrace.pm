@@ -48,7 +48,8 @@ sub _record_caller_data
     {
         my @a = @DB::args;
 
-        if ( $self->{no_refs} ) {
+        if ( $self->{no_refs} )
+        {
             @a = map { ref $_ ? $self->_ref_to_string($_) : $_ } @a;
         }
 
