@@ -104,6 +104,22 @@ sub _make_frames
 {
     my $self = shift;
 
+    my $filter = $self->_make_frame_filter;
+
+    my $raw = delete $self->{raw};
+    for my $r ( @{$raw} )
+    {
+        next unless $filter->($r);
+
+        $self->_add_frame( $r->{caller}, $r->{args} );
+    }
+}
+
+my $default_filter = sub { 1 };
+sub _make_frame_filter
+{
+    my $self = shift;
+
     my (@i_pack_re, %i_class);
     if ( $self->{ignore_package} )
     {
@@ -113,23 +129,26 @@ sub _make_frames
         @i_pack_re = map { ref $_ ? $_ : qr/^\Q$_\E$/ } @{ $self->{ignore_package} };
     }
 
+    my $p = __PACKAGE__;
+    push @i_pack_re, qr/^\Q$p\E$/;
+
     if ( $self->{ignore_class} )
     {
         $self->{ignore_class} = [ $self->{ignore_class} ] unless ref $self->{ignore_class};
         %i_class = map {$_ => 1} @{ $self->{ignore_class} };
     }
 
-    my $p = __PACKAGE__;
-    push @i_pack_re, qr/^\Q$p\E$/;
-
-    my $raw = delete $self->{raw};
-    for my $r ( @{$raw} )
+    if ( @i_pack_re || %i_class )
     {
-        next if grep { $r->{caller}[0] =~ /$_/ } @i_pack_re;
-        next if grep { $r->{caller}[0]->isa($_) } keys %i_class;
-
-        $self->_add_frame( $r->{caller}, $r->{args} );
+        return sub
+        {
+            return 0 if grep { $_[0]{caller}[0] =~ /$_/ } @i_pack_re;
+            return 0 if grep { $_[0]{caller}[0]->isa($_) } keys %i_class;
+            return 1;
+        };
     }
+
+    return $self->{frame_filter} || $default_filter;
 }
 
 sub _add_frame
