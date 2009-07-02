@@ -6,7 +6,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 41;
+    my $tests = 40;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
