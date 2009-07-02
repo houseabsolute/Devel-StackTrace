@@ -472,6 +472,23 @@ Takes the following parameters:
 
 =over 8
 
+=item * frame_filter => $sub
+
+By default, Devel::StackTrace will include all stack frames before the
+call to its its constructor.
+
+However, you may want to filter out some frames with more granularity
+than 'ignore_package' or 'ignore_class' allow.
+
+You can provide a subroutine which is called with the raw frame data
+for each frame. This is a hash reference with two keys, "caller", and
+"args", both of which are array references. The "caller" key is the
+raw data as returned by Perl's C<caller()> function, and the "args"
+key are the subroutine arguments found in C<@DB::args>.
+
+The filter should return true if the frame should be included, or
+false if it should be skipped.
+
 =item * ignore_package => $package_name OR \@package_names
 
 Any frames where the package is one of these packages will not be on
