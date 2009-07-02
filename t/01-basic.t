@@ -6,7 +6,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 37;
+    my $tests = 41;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
@@ -298,6 +298,15 @@ SKIP:
         'no error when respect_overload is true and object overloads but does not stringify' );
 }
 
+{
+    my $trace = Filter::foo();
+
+    my @frames = $trace->frames();
+    is( scalar @frames, 2, 'filtered trace has just 2 frames' );
+    is( $frames[0]->subroutine(), 'Devel::StackTrace::new', 'first subroutine' );
+    is( $frames[1]->subroutine(), 'Filter::bar', 'second subroutine (skipped Filter::foo)' );
+}
+
 # This means I can move these lines down without constantly fiddling
 # with the checks for line numbers in the tests.
 
@@ -436,4 +445,16 @@ sub new
 {
     my $class = shift;
     return bless {}, $class;
+}
+
+package Filter;
+
+sub foo
+{
+    bar();
+}
+
+sub bar
+{
+    return Devel::StackTrace->new( frame_filter => sub { $_[0]{caller}[3] ne 'Filter::foo' } );
 }
