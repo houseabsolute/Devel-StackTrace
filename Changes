@@ -1,8 +1,12 @@
-1.21
+1.21  Jul 1, 2009
 
 - Overloaded objects which didn't provide a stringification method
   cause Devel::StackTrace to die when respect_overload was
   true. Reported by Laurent Dami. RT #39533.
+
+- Added a frame_filter option which allows for fine-grained control
+  over what frames are included in a trace. Based on (but expanded)
+  from a patch proposed by Florian Ragwitz. RT #47415.
 
 
 1.20  Oct 25, 2008
