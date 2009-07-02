@@ -12,7 +12,7 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 
 sub new
