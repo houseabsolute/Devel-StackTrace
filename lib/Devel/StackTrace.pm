@@ -138,17 +138,20 @@ sub _make_frame_filter
         %i_class = map {$_ => 1} @{ $self->{ignore_class} };
     }
 
-    if ( @i_pack_re || %i_class )
-    {
-        return sub
-        {
-            return 0 if grep { $_[0]{caller}[0] =~ /$_/ } @i_pack_re;
-            return 0 if grep { $_[0]{caller}[0]->isa($_) } keys %i_class;
-            return 1;
-        };
-    }
+    my $user_filter = $self->{frame_filter};
 
-    return $self->{frame_filter} || $default_filter;
+    return sub
+    {
+        return 0 if grep { $_[0]{caller}[0] =~ /$_/ } @i_pack_re;
+        return 0 if grep { $_[0]{caller}[0]->isa($_) } keys %i_class;
+
+        if ( $user_filter )
+        {
+            return $user_filter->( $_[0] );
+        }
+
+        return 1;
+    };
 }
 
 sub _add_frame
