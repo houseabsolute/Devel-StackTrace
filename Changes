@@ -1,3 +1,10 @@
+1.21
+
+- Overloaded objects which didn't provide a stringification method
+  cause Devel::StackTrace to die when respect_overload was
+  true. Reported by Laurent Dami. RT #39533.
+
+
 1.20  Oct 25, 2008
 
 - The change in 1.15 to object creation broke the no_refs feature,

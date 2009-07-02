@@ -5,7 +5,7 @@ use Test::More;
 
 BEGIN
 {
-    my $tests = 37;
+    my $tests = 38;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
@@ -291,6 +291,14 @@ SKIP:
         'non-refs are preserved properly in raw data as well' );
 }
 
+{
+    my $trace = overload_no_stringify( CodeOverload->new() );
+
+    eval { $trace->as_string() };
+    is( $@, q{},
+        'no error when respect_overload is true and object overloads but does not stringify' );
+}
+
 # This means I can move these lines down without constantly fiddling
 # with the checks for line numbers in the tests.
 
@@ -324,6 +332,12 @@ sub max_arg_length
 {
     Devel::StackTrace->new( max_arg_length => 10 );
 }
+
+sub overload_no_stringify
+{
+    return Devel::StackTrace->new( no_refs => 1, respect_overload => 1 );
+}
+
 
 package Test;
 
@@ -413,4 +427,14 @@ sub new
 sub trace
 {
     Devel::StackTrace->new( no_refs => 1 );
+}
+
+package CodeOverload;
+
+use overload '&{}' => sub { 'foo' };
+
+sub new
+{
+    my $class = shift;
+    return bless {}, $class;
 }

@@ -68,8 +68,13 @@ sub _ref_to_string
         if blessed $ref && $ref->isa('Exception::Class::Base');
 
     return overload::StrVal($ref) unless $self->{respect_overload};
-    # force stringification and let overloading do its thing
-    return $ref . '';
+
+    local $@;
+    local $SIG{__DIE__};
+
+    my $str = eval { $ref . '' };
+
+    return $@ ? overload::StrVal($ref) : $str;
 }
 
 sub _ecb_hack
