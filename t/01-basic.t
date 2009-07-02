@@ -1,17 +1,16 @@
 use strict;
 use warnings;
 
+use Devel::StackTrace;
 use Test::More;
 
 BEGIN
 {
-    my $tests = 38;
+    my $tests = 37;
     eval { require Exception::Class };
     $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
 
     plan tests => $tests;
-
-    use_ok('Devel::StackTrace');
 }
 
 sub get_file_name { File::Spec->canonpath( (caller(0))[1] ) }
