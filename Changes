@@ -1,3 +1,11 @@
+1.22  Jul 15, 2009
+
+- Apparently, overload::StrVal on older Perls (5.8.5, but not 5.8.8)
+  tried to call a stringification method if it existed. So now,
+  Devel::StackTrace just uses overload::AddrRef instead, which should
+  always be safe. Reported by Michael Stevens. Fixes RT #47900.
+
+
 1.21  Jul 1, 2009
 
 - Overloaded objects which didn't provide a stringification method
