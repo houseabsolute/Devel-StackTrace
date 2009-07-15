@@ -65,17 +65,17 @@ sub _ref_to_string
     my $self = shift;
     my $ref  = shift;
 
-    return overload::StrVal($ref)
+    return overload::AddrRef($ref)
         if blessed $ref && $ref->isa('Exception::Class::Base');
 
-    return overload::StrVal($ref) unless $self->{respect_overload};
+    return overload::AddrRef($ref) unless $self->{respect_overload};
 
     local $@;
     local $SIG{__DIE__};
 
     my $str = eval { $ref . '' };
 
-    return $@ ? overload::StrVal($ref) : $str;
+    return $@ ? overload::AddrRef($ref) : $str;
 }
 
 sub _make_frames
@@ -493,7 +493,7 @@ representation.
 
 =item * respect_overload => $boolean
 
-By default, Devel::StackTrace will call C<overload::StrVal()> to get
+By default, Devel::StackTrace will call C<overload::AddrRef()> to get
 the underlying string representation of an object, instead of
 respecting the object's stringification overloading.  If you would
 prefer to see the overloaded representation of objects in stack

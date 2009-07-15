@@ -294,6 +294,7 @@ SKIP:
     my $trace = overload_no_stringify( CodeOverload->new() );
 
     eval { $trace->as_string() };
+
     is( $@, q{},
         'no error when respect_overload is true and object overloads but does not stringify' );
 }
