@@ -46,16 +46,16 @@ sub _record_caller_data
     while ( my @c =
             do { package DB; @DB::args = (); caller($x++) } )
     {
-        my @a = @DB::args;
+        my @args = @DB::args;
 
         if ( $self->{no_refs} )
         {
-            @a = map { ref $_ ? $self->_ref_to_string($_) : $_ } @a;
+            @args = map { ref $_ ? $self->_ref_to_string($_) : $_ } @args;
         }
 
         push @{ $self->{raw} },
             { caller => \@c,
-              args   => \@a,
+              args   => \@args,
             };
     }
 }
