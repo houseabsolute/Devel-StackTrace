@@ -5,17 +5,26 @@ use warnings;
 
 use Module::Build;
 
-my $build =
-    Module::Build->new( module_name => 'Devel::StackTrace',
-                        license     => 'perl',
-                        requires    => { 'File::Spec'   => '0',
-                                         'Scalar::Util' => '0',
-                                         'Test::More'   => '0.46',
-                                         'perl'         => '5.006',
-                                       },
-                        sign        => 1,
-                        create_makefile_pl => 'traditional',
-                        create_readme      => 1,
-                      );
+my $build = Module::Build->new(
+    module_name => 'Devel::StackTrace',
+    license     => 'perl',
+    requires    => {
+        'File::Spec'   => '0',
+        'Scalar::Util' => '0',
+        'Test::More'   => '0.46',
+        'perl'         => '5.006',
+    },
+    sign               => 1,
+    create_makefile_pl => 'traditional',
+    create_readme      => 1,
+    meta_merge         => {
+        resources => {
+            bugtracker =>
+                'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-StackTrace',
+            repository =>
+                'http://hg.urth.org/hg/Devel-StackTrace',
+        },
+    },
+);
 
 $build->create_build_script;
