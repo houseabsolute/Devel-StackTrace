@@ -146,8 +146,12 @@ sub _add_frame
     }
 
     push @{ $self->{frames} },
-        Devel::StackTraceFrame->new( $c, $args,
-                                     $self->{respect_overload}, $self->{max_arg_length} );
+        Devel::StackTraceFrame->new( $c,
+                                     $args,
+                                     $self->{respect_overload},
+                                     $self->{max_arg_length},
+                                     $self->{message},
+                                     $self->{indent} );
 }
 
 sub next_frame
@@ -270,16 +274,20 @@ BEGIN
 
         my $self = bless {}, $class;
 
-        @{ $self }{ @fields } = @{$_[0]};
+        @{ $self }{ @fields } = @{shift()};
 
         # fixup unix-style paths on win32
         $self->{filename} = File::Spec->canonpath( $self->{filename} );
 
-        $self->{args} = $_[1];
+        $self->{args} = shift;
 
-        $self->{respect_overload} = $_[2];
+        $self->{respect_overload} = shift;
 
-        $self->{max_arg_length} = $_[3];
+        $self->{max_arg_length} = shift;
+
+        $self->{message} = shift;
+
+        $self->{indent} = shift;
 
         return $self;
     }
@@ -302,7 +310,10 @@ sub as_string
     # errors are probably my fault  -dave
     if ($first)
     {
-        $sub = 'Trace begun';
+        $sub
+            = defined $self->{message}
+            ? $self->{message}
+            : 'Trace begun';
     }
     else
     {
@@ -365,14 +376,16 @@ sub as_string
                     $_ = $e =~ /malformed utf-8/i ? '(bad utf-8)' : '?';
                 }
             }
-
             # append ('all', 'the', 'arguments') to the $sub string
             $sub .= '(' . join(', ', @a) . ')';
             $sub .= ' called';
         }
     }
 
-    return "$sub at " . $self->filename . ' line ' . $self->line;
+    # If the user opted into indentation (a la Carp::confess), pre-add a tab
+    my $tab = $self->{indent} && ! $first ? "\t" : q{};
+
+    return "${tab}$sub at " . $self->filename . ' line ' . $self->line;
 }
 
 1;
@@ -505,6 +518,17 @@ By default, Devel::StackTrace will display the entire argument for
 each subroutine call. Setting this parameter causes it to truncate the
 argument's string representation if it is longer than this number of
 characters.
+
+=item * message => $string
+
+By default, Devel::StackTrace will use 'Trace begun' as the message for the
+first stack frame when you call C<as_string>. You can supply an alternative
+message using this option.
+
+=item * indent => $boolean
+
+If this parameter is true, each stack frame after the first will start with a
+tab character, just like C<Carp::confess()>.
 
 =back
 
