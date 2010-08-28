@@ -10,10 +10,7 @@ plan skip_all => 'These tests require Encode.pm'
 plan skip_all => 'These tests require Perl 5.8.8+'
     unless $] >= 5.008008;
 
-plan tests => 2;
-
 use Devel::StackTrace;
-
 
 # This should be invalid UTF8
 my $raw_bad = do { use bytes; chr( 0xED ) . chr( 0xA1 ) . chr( 0xBA ) };
@@ -34,3 +31,5 @@ sub foo
 {
     Devel::StackTrace->new();
 }
+
+done_testing();

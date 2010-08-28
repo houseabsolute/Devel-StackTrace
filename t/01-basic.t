@@ -1,17 +1,9 @@
 use strict;
 use warnings;
 
-use Devel::StackTrace;
 use Test::More;
 
-BEGIN
-{
-    my $tests = 40;
-    eval { require Exception::Class };
-    $tests++ if ! $@ && $Exception::Class::VERSION >= 1.09;
-
-    plan tests => $tests;
-}
+use Devel::StackTrace;
 
 sub get_file_name { File::Spec->canonpath( (caller(0))[1] ) }
 my $test_file_name = get_file_name();
@@ -53,7 +45,7 @@ my $test_file_name = get_file_name();
 Trace begun at $test_file_name line 1012
 main::baz(1, 2) called at $test_file_name line 1007
 main::bar(1) called at $test_file_name line 1002
-main::foo at $test_file_name line 21
+main::foo at $test_file_name line 13
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
@@ -91,7 +83,7 @@ EOF
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1012
-main::baz at $test_file_name line 90
+main::baz at $test_file_name line 82
 EOF
 
     my $t = "$trace";
@@ -261,7 +253,7 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1027
-main::max_arg_length('abcdefghij...') called at $test_file_name line 260
+main::max_arg_length('abcdefghij...') called at $test_file_name line 252
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
@@ -307,6 +299,8 @@ SKIP:
     is( $frames[0]->subroutine(), 'Devel::StackTrace::new', 'first subroutine' );
     is( $frames[1]->subroutine(), 'Filter::bar', 'second subroutine (skipped Filter::foo)' );
 }
+
+done_testing();
 
 # This means I can move these lines down without constantly fiddling
 # with the checks for line numbers in the tests.
