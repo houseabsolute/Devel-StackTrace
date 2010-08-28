@@ -371,14 +371,12 @@ __END__
   print $trace->as_string; # like carp
 
   # from top (most recent) of stack to bottom.
-  while (my $frame = $trace->next_frame)
-  {
+  while (my $frame = $trace->next_frame) {
       print "Has args\n" if $frame->hasargs;
   }
 
   # from bottom (least recent) of stack to top.
-  while (my $frame = $trace->prev_frame)
-  {
+  while (my $frame = $trace->prev_frame) {
       print "Sub: ", $frame->subroutine, "\n";
   }
 
@@ -406,13 +404,11 @@ Here's an example:
 
   foo();  # bottom frame is here
 
-  sub foo
-  {
+  sub foo {
      bar();
   }
 
-  sub bar
-  {
+  sub bar {
      Devel::StackTrace->new;  # top frame is here.
   }
 
