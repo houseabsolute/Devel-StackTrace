@@ -40,7 +40,7 @@ my $test_file_name = get_file_name();
         "First frame filename should be $test_file_name"
     );
 
-    is( $f[0]->line, 1012, "First frame line should be 1012" );
+    is( $f[0]->line, 1009, "First frame line should be 1009" );
 
     is(
         $f[0]->subroutine, 'Devel::StackTrace::new',
@@ -55,9 +55,9 @@ my $test_file_name = get_file_name();
     );
 
     my $trace_text = <<"EOF";
-Trace begun at $test_file_name line 1012
-main::baz(1, 2) called at $test_file_name line 1007
-main::bar(1) called at $test_file_name line 1002
+Trace begun at $test_file_name line 1009
+main::baz(1, 2) called at $test_file_name line 1005
+main::bar(1) called at $test_file_name line 1001
 main::foo at $test_file_name line 13
 EOF
 
@@ -99,8 +99,8 @@ EOF
     my $trace = baz();
 
     my $trace_text = <<"EOF";
-Trace begun at $test_file_name line 1012
-main::baz at $test_file_name line 82
+Trace begun at $test_file_name line 1009
+main::baz at $test_file_name line 99
 EOF
 
     my $t = "$trace";
@@ -308,8 +308,8 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
     my $trace = max_arg_length('abcdefghijklmnop');
 
     my $trace_text = <<"EOF";
-Trace begun at $test_file_name line 1027
-main::max_arg_length('abcdefghij...') called at $test_file_name line 252
+Trace begun at $test_file_name line 1021
+main::max_arg_length('abcdefghij...') called at $test_file_name line 308
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
