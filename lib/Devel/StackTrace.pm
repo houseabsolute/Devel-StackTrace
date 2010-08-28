@@ -12,8 +12,6 @@ use overload
     '""' => \&as_string,
     fallback => 1;
 
-our $VERSION = '1.22';
-
 
 sub new
 {
@@ -391,11 +389,9 @@ sub as_string
 1;
 
 
+# ABSTRACT: Stack trace and stack trace frame objects
+
 __END__
-
-=head1 NAME
-
-Devel::StackTrace - Stack trace and stack trace frame objects
 
 =head1 SYNOPSIS
 
@@ -619,18 +615,5 @@ that are references are returned as references, not copies.
 Please submit bugs to the CPAN RT system at
 http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel%3A%3AStackTrace
 or via email at bug-devel-stacktrace@rt.cpan.org.
-
-=head1 AUTHOR
-
-Dave Rolsky, <autarch@urth.org>
-
-=head1 COPYRIGHT
-
-Copyright (c) 2000-2006 David Rolsky.  All rights reserved.  This
-program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-The full text of the license can be found in the LICENSE file included
-with this module.
 
 =cut
