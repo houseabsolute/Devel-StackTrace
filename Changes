@@ -1,3 +1,14 @@
+1.24  Sep 3, 2010
+
+- Version 1.23 was missing a $VERSION assignment. Reported by Sergei
+  Vyshenski.
+
+- Moved the frame object to its own file, and renamed it
+  Devel::StackTrace::Frame. The old package name, Devel::StackTraceFrame, is
+  now a subclass of the new package, to provide a backwards compatibility
+  shim.
+
+
 1.23  Aug 27, 2010
 
 - Added message and indent constructor parameters. Based on a patch by James
