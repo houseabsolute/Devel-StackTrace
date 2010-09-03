@@ -41,7 +41,8 @@ sub _record_caller_data {
     my $x = 1;
     while (
         my @c
-        = do { package DB; @DB::args = (); caller( $x++ ) }
+        = do { package # the newline keeps dzil from adding a version here
+                   DB; @DB::args = (); caller( $x++ ) }
         ) {
         my @args = @DB::args;
 
