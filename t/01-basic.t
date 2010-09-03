@@ -320,7 +320,7 @@ SKIP:
     skip "Test only runs on Linux", 1
         unless $^O eq 'linux';
 
-    my $frame = Devel::StackTraceFrame->new(
+    my $frame = Devel::StackTrace::Frame->new(
         [ 'Foo', 'foo/bar///baz.pm', 10, 'bar', 1, 1, '', 0 ],
         []
     );
