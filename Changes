@@ -1,3 +1,9 @@
+1.25  Sep 6, 2010
+
+- Devel::StackTraceFrame was not actually subclassing
+  Devel::StackTrace::Frame. Patch by Tatsuhiko Miyagawa.
+
+
 1.24  Sep 3, 2010
 
 - Version 1.23 was missing a $VERSION assignment. Reported by Sergei
