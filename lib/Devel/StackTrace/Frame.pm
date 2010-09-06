@@ -1,4 +1,4 @@
-package  Devel::StackTrace::Frame;
+package Devel::StackTrace::Frame;
 
 use strict;
 use warnings;
