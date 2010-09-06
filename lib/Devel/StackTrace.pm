@@ -225,7 +225,7 @@ sub as_string {
     package
         Devel::StackTraceFrame;
 
-    our @ISA = 'Devel::StackTrace';
+    our @ISA = 'Devel::StackTrace::Frame';
 }
 
 1;
