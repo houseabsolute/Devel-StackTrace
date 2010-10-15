@@ -1,3 +1,9 @@
+1.26  2010-10-15
+
+- The as_string method did not localize $@ and $SIG{__DIE__} before doing an
+  eval. Reported and tested by Marc Mims. RT #61072.
+
+
 1.25  Sep 6, 2010
 
 - Devel::StackTraceFrame was not actually subclassing
