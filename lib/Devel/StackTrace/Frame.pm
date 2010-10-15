@@ -99,6 +99,9 @@ sub as_string {
                 $_ = $self->Devel::StackTrace::_ref_to_string($_)
                     if ref $_;
 
+                local $SIG{__DIE__};
+                local $@;
+
                 eval {
                     if ( $self->{max_arg_length}
                         && length $_ > $self->{max_arg_length} ) {
