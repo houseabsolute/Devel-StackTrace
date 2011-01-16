@@ -10,6 +10,9 @@ plan skip_all => 'These tests require Encode.pm'
 plan skip_all => 'These tests require Perl 5.8.8+'
     unless $] >= 5.008008;
 
+plan skip_all => 'These tests are not relevant with Perl 5.13.8+'
+    if $] >= 5.013008;
+
 use Devel::StackTrace;
 
 # This should be invalid UTF8
