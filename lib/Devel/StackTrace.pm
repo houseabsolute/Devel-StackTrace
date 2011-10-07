@@ -40,9 +40,12 @@ sub _record_caller_data {
     # We exclude this method by starting one frame back.
     my $x = 1;
     while (
-        my @c
-        = do { package # the newline keeps dzil from adding a version here
-                   DB; @DB::args = (); caller( $x++ ) }
+        my @c = do {
+            package    # the newline keeps dzil from adding a version here
+                DB;
+            @DB::args = ();
+            caller( $x++ );
+        }
         ) {
         my @args = @DB::args;
 
@@ -50,7 +53,8 @@ sub _record_caller_data {
             @args = map { ref $_ ? $self->_ref_to_string($_) : $_ } @args;
         }
 
-        push @{ $self->{raw} }, {
+        push @{ $self->{raw} },
+            {
             caller => \@c,
             args   => \@args,
             };
@@ -87,7 +91,7 @@ sub _make_frames {
     }
 }
 
-my $default_filter = sub {1};
+my $default_filter = sub { 1 };
 
 sub _make_frame_filter {
     my $self = shift;
