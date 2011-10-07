@@ -40,17 +40,25 @@ sub _record_caller_data {
     # We exclude this method by starting one frame back.
     my $x = 1;
     while (
-        my @c = do {
+        my @c
+        = $self->{no_args}
+        ? caller( $x++ )
+        : do {
             package    # the newline keeps dzil from adding a version here
                 DB;
             @DB::args = ();
             caller( $x++ );
         }
         ) {
-        my @args = @DB::args;
 
-        if ( $self->{no_refs} ) {
-            @args = map { ref $_ ? $self->_ref_to_string($_) : $_ } @args;
+        my @args;
+
+        unless ( $self->{no_args} ) {
+            @args = @DB::args;
+
+            if ( $self->{no_refs} ) {
+                @args = map { ref $_ ? $self->_ref_to_string($_) : $_ } @args;
+            }
         }
 
         push @{ $self->{raw} },
@@ -99,7 +107,7 @@ sub _make_frame_filter {
     my ( @i_pack_re, %i_class );
     if ( $self->{ignore_package} ) {
         $self->{ignore_package} = [ $self->{ignore_package} ]
-            unless UNIVERSAL::isa( $self->{ignore_package}, 'ARRAY' );
+            unless eval { @{ $self->{ignore_package} } };
 
         @i_pack_re
             = map { ref $_ ? $_ : qr/^\Q$_\E$/ } @{ $self->{ignore_package} };
@@ -337,6 +345,11 @@ your objects go out of scope.
 
 Devel::StackTrace replaces any references with their stringified
 representation.
+
+=item * no_args => $boolean
+
+If this parameter is true, then Devel::StackTrace will not store caller
+arguments in stack trace frames at all.
 
 =item * respect_overload => $boolean
 
