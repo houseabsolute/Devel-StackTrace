@@ -132,9 +132,6 @@ sub _add_frame {
     # eval and is_require are only returned when applicable under 5.00503.
     push @$c, ( undef, undef ) if scalar @$c == 6;
 
-    if ( $self->{no_refs} ) {
-    }
-
     push @{ $self->{frames} },
         Devel::StackTrace::Frame->new(
         $c,
