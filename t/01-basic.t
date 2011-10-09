@@ -47,7 +47,7 @@ my $test_file_name = get_file_name();
         "First frame subroutine should be Devel::StackTrace::new"
     );
 
-    is( $f[0]->hasargs, 1, "First frame hasargs should be true" );
+    is( $f[0]->has_args, 1, "First frame has_args should be true" );
 
     ok(
         !$f[0]->wantarray,
@@ -56,9 +56,9 @@ my $test_file_name = get_file_name();
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1009
-main::baz(1, 2) called at $test_file_name line 1005
-main::bar(1) called at $test_file_name line 1001
-main::foo at $test_file_name line 13
+\tmain::baz(1, 2) called at $test_file_name line 1005
+\tmain::bar(1) called at $test_file_name line 1001
+\tmain::foo at $test_file_name line 13
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
@@ -100,7 +100,7 @@ EOF
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1009
-main::baz at $test_file_name line 99
+\tmain::baz at $test_file_name line 99
 EOF
 
     my $t = "$trace";
@@ -261,7 +261,7 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 
     package StringOverloaded;
 
-    use overload '""' => sub {'overloaded'};
+    use overload '""' => sub {'overloading called'};
 }
 
 {
@@ -270,7 +270,7 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
     my $trace = baz($o);
 
     unlike(
-        $trace->as_string, qr/\boverloaded\b/,
+        $trace->as_string, qr/\boverloading called\b/,
         'overloading is ignored by default'
     );
 }
@@ -281,8 +281,8 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
     my $trace = respect_overloading($o);
 
     like(
-        $trace->as_string, qr/\boverloaded\b/,
-        'overloading is ignored by default'
+        $trace->as_string, qr/\boverloading called\b/,
+        'respect overloading'
     );
 }
 
@@ -309,7 +309,7 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1021
-main::max_arg_length('abcdefghij...') called at $test_file_name line 308
+\tmain::max_arg_length('abcdefghij...') called at $test_file_name line 308
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
@@ -321,8 +321,18 @@ SKIP:
         unless $^O eq 'linux';
 
     my $frame = Devel::StackTrace::Frame->new(
-        [ 'Foo', 'foo/bar///baz.pm', 10, 'bar', 1, 1, '', 0 ],
-        []
+        package    => 'Foo',
+        filename   => 'foo/bar///baz.pm',
+        line       => 10,
+        subroutine => 'bar',
+        has_args   => 1,
+        wantarray  => 1,
+        evaltext   => undef,
+        is_require => '',
+        hints      => 0,
+        bitmask    => 0,
+        hinthash   => undef,
+        args       => [],
     );
 
     is( $frame->filename, 'foo/bar/baz.pm', 'filename is canonicalized' );
@@ -385,7 +395,7 @@ sub bar {
 }
 
 sub baz {
-    Devel::StackTrace->new( @_ ? @_[ 0, 1 ] : () );
+    Devel::StackTrace->new();
 }
 
 sub quux {

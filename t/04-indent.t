@@ -16,19 +16,19 @@ sub make_dst {
 {
     my $dst = make_dst();
 
-    for my $line ( split /\n/, $dst->as_string() ) {
-        unlike( $line, qr/^\s/, 'line does not start with whitespace' );
-    }
-}
-
-{
-    my $dst = make_dst( indent => 1 );
-
     my @lines = split /\n/, $dst->as_string();
     shift @lines;
 
     for my $line (@lines) {
-        like( $line, qr/^\s/, 'line starts with whitespace' );
+        like( $line, qr/^\s/, 'line starts with whitespace by default' );
+    }
+}
+
+{
+    my $dst = make_dst( indent => 0 );
+
+    for my $line ( split /\n/, $dst->as_string() ) {
+        unlike( $line, qr/^\s/, 'lines does not start with whitespace' );
     }
 }
 

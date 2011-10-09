@@ -1,12 +1,12 @@
 package Devel::StackTrace;
 
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings;
 
 use Devel::StackTrace::Frame;
-use File::Spec;
+use List::AllUtils qw( zip );
 use Scalar::Util qw( blessed );
 
 use overload
@@ -136,23 +136,39 @@ sub _make_frame_filter {
     };
 }
 
-sub _add_frame {
-    my $self = shift;
-    my $c    = shift;
-    my $args = shift;
+{
+    my @fields = qw(
+        package
+        filename
+        line
+        subroutine
+        has_args
+        wantarray
+        evaltext
+        is_require
+        hints
+        bitmask
+    );
 
-    # eval and is_require are only returned when applicable under 5.00503.
-    push @$c, ( undef, undef ) if scalar @$c == 6;
+    push @fields, 'hinthash' if $] >= 5.010;
 
-    push @{ $self->{frames} },
-        Devel::StackTrace::Frame->new(
-        $c,
-        $args,
-        $self->{respect_overload},
-        $self->{max_arg_length},
-        $self->{message},
-        $self->{indent}
+    sub _add_frame {
+        my $self = shift;
+        my $c    = shift;
+        my $args = shift;
+
+        my %p = zip( @fields, @{$c} );
+        $p{args} = $args;
+
+        $p{$_} = $self->{$_} for grep { defined $self->{$_} } qw(
+            respect_overload
+            max_arg_length
+            message
+            indent
         );
+
+        push @{ $self->{frames} }, Devel::StackTrace::Frame->new(%p);
+    }
 }
 
 sub next_frame {

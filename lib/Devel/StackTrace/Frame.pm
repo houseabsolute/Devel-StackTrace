@@ -1,72 +1,144 @@
 package Devel::StackTrace::Frame;
 
+use 5.008;
+
 use strict;
 use warnings;
 
-# Create accessor routines
-BEGIN {
-    no strict 'refs';
-    foreach my $f (
-        qw( package filename line subroutine hasargs
-        wantarray evaltext is_require hints bitmask args )
-        ) {
-        next if $f eq 'args';
-        *{$f} = sub { my $s = shift; return $s->{$f} };
-    }
-}
+use Any::Moose;
+use Carp ();
+use File::Spec;
 
-{
-    my @fields = (
-        qw( package filename line subroutine hasargs wantarray
-            evaltext is_require hints bitmask )
+has [qw( package filename subroutine )] => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+);
+
+has line => (
+    is       => 'ro',
+    isa      => 'Int',
+    required => 1,
+);
+
+has has_args => (
+    is       => 'ro',
+    isa      => 'Bool',
+    required => 1,
+);
+
+sub hasargs { goto &has_args }
+
+has wantarray => (
+    is       => 'ro',
+    isa      => 'Bool',    # well, more of a Troolean
+    required => 1,
+);
+
+has evaltext => (
+    is       => 'ro',
+    isa      => 'Maybe[Str]',
+    required => 1,
+);
+
+has is_require => (
+    is       => 'ro',
+    isa      => 'Bool',
+    required => 1,
+);
+
+has hints => (
+    is       => 'ro',
+    isa      => 'Defined',
+    required => 1,
+);
+
+has bitmask => (
+    is       => 'ro',
+    isa      => 'Defined',
+    required => 1,
+);
+
+if ( $] >= 5.010 ) {
+    has hinthash => (
+        is       => 'ro',
+        isa      => 'Maybe[HashRef]',
+        required => 1,
     );
-
-    sub new {
-        my $proto = shift;
-        my $class = ref $proto || $proto;
-
-        my $self = bless {}, $class;
-
-        @{$self}{@fields} = @{ shift() };
-
-        # fixup unix-style paths on win32
-        $self->{filename} = File::Spec->canonpath( $self->{filename} );
-
-        $self->{args} = shift;
-
-        $self->{respect_overload} = shift;
-
-        $self->{max_arg_length} = shift;
-
-        $self->{message} = shift;
-
-        $self->{indent} = shift;
-
-        return $self;
-    }
 }
 
-sub args {
-    my $self = shift;
+has message => (
+    is        => 'ro',
+    isa       => 'Str',
+    predicate => '_has_message',
+);
 
-    return @{ $self->{args} };
-}
+has tid => (
+    is        => 'ro',
+    isa       => 'Str',
+    predicate => '_has_tid',
+);
+
+has args => (
+    is         => 'ro',
+    isa        => 'ArrayRef',
+    required   => 1,
+    auto_deref => 1,
+);
+
+has max_args => (
+    is  => 'ro',
+    isa => 'Int',
+);
+
+has max_arg_length => (
+    is  => 'ro',
+    isa => 'Int',
+);
+
+has max_eval_length => (
+    is  => 'ro',
+    isa => 'Int',
+);
+
+has respect_overload => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0,
+);
+
+has indent => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 1,
+);
+
+override BUILDARGS => sub {
+    my $class = shift;
+
+    my $p = super();
+
+    $p->{filename} = File::Spec->canonpath( $p->{filename} );
+
+    return $p;
+};
 
 sub as_string {
     my $self  = shift;
     my $first = shift;
 
-    my $sub = $self->subroutine;
+    my $sub;
 
     # This code stolen straight from Carp.pm and then tweaked.  All
     # errors are probably my fault  -dave
     if ($first) {
         $sub
-            = defined $self->{message}
-            ? $self->{message}
+            = $self->_has_message()
+            ? $self->message()
             : 'Trace begun';
     }
     else {
+        $sub = $self->subroutine();
 
         # Build a string, $sub, which names the sub-routine called.
         # This may also be "require ...", "eval '...' or "eval {...}"
@@ -89,7 +161,7 @@ sub as_string {
         #
         # We copy them because they're going to be modified.
         #
-        if ( my @a = $self->args ) {
+        if ( my @a = $self->args() ) {
             for (@a) {
 
                 # set args to the string "undef" if undefined
@@ -103,9 +175,9 @@ sub as_string {
                 local $@;
 
                 eval {
-                    if ( $self->{max_arg_length}
-                        && length $_ > $self->{max_arg_length} ) {
-                        substr( $_, $self->{max_arg_length} ) = '...';
+                    if ( $self->max_arg_length()
+                        && length $_ > $self->max_arg_length() ) {
+                        substr( $_, $self->max_arg_length() ) = '...';
                     }
 
                     s/'/\\'/g;
@@ -113,9 +185,9 @@ sub as_string {
                     # 'quote' arg unless it looks like a number
                     $_ = "'$_'" unless /^-?[\d.]+$/;
 
-                    # print control/high ASCII chars as 'M-<char>' or '^<char>'
-                    s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
-                    s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
+                    # print non-printable ASCII chars as \x{0x01} - doesn't
+                    # handle non-printable Unicode characters.
+                    s/([\0-\37\177])/sprintf( "\\x{%x}", ord($1) )/eg;
                 };
 
                 if ( my $e = $@ ) {
@@ -130,9 +202,9 @@ sub as_string {
     }
 
     # If the user opted into indentation (a la Carp::confess), pre-add a tab
-    my $tab = $self->{indent} && !$first ? "\t" : q{};
+    my $tab = $self->indent() && !$first ? "\t" : q{};
 
-    return "${tab}$sub at " . $self->filename . ' line ' . $self->line;
+    return "${tab}$sub at " . $self->filename() . ' line ' . $self->line();
 }
 
 1;
@@ -160,7 +232,7 @@ methods return.
 
 =item * $frame->subroutine
 
-=item * $frame->hasargs
+=item * $frame->has_args
 
 =item * $frame->wantarray
 
