@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use Devel::StackTrace::Frame;
-use List::AllUtils qw( zip );
 use Scalar::Util qw( blessed );
 
 use overload
@@ -29,7 +28,15 @@ sub new {
         %p,
     }, $class;
 
-    $self->_record_caller_data();
+    # There are two different methods as an optimization. Doing a conditional
+    # check on whether to record args each time through the loop has a small
+    # but noticeable impact on speed.
+    if ( $self->{no_args} ) {
+        $self->_record_caller_data_no_args();
+    }
+    else {
+        $self->_record_caller_data();
+    }
 
     return $self;
 }
@@ -37,36 +44,58 @@ sub new {
 sub _record_caller_data {
     my $self = shift;
 
+    my $nrefs = $self->{no_refs};
+
+    my @raw;
+
     # We exclude this method by starting one frame back.
     my $x = 1;
-    while (
-        my @c
-        = $self->{no_args}
-        ? caller( $x++ )
-        : do {
+    while (1) {
+        my @c = do {
             package    # the newline keeps dzil from adding a version here
                 DB;
             @DB::args = ();
             caller( $x++ );
-        }
-        ) {
+        };
+
+        last unless @c;
 
         my @args;
-
-        unless ( $self->{no_args} ) {
+        if ( @DB::args && $nrefs ) {
+            @args = map { ref $_ ? $self->_ref_to_string($_) : $_ } @DB::args;
+        }
+        else {
             @args = @DB::args;
-
-            if ( $self->{no_refs} ) {
-                @args = map { ref $_ ? $self->_ref_to_string($_) : $_ } @args;
-            }
         }
 
-        push @{ $self->{raw} },
-            {
-            caller => \@c,
-            args   => \@args,
-            };
+        push @raw, { caller => \@c, args => \@args, };
     }
+
+    $self->{raw} = \@raw;
+
+    return;
+}
+
+sub _record_caller_data_no_args {
+    my $self = shift;
+
+    my @raw;
+    # We can reuse the same ref each time
+    my $args = [];
+
+    # We exclude this method by starting one frame back.
+    my $x = 1;
+    while (1) {
+        my @c = caller( $x++ );
+
+        last unless @c;
+
+        push @raw, { caller => \@c, args => $args, };
+    }
+
+    $self->{raw} = \@raw;
+
+    return;
 }
 
 sub _ref_to_string {
@@ -157,7 +186,9 @@ sub _make_frame_filter {
         my $c    = shift;
         my $args = shift;
 
-        my %p = zip( @fields, @{$c} );
+        my %p;
+        @p{@fields} = @{$c};
+
         $p{args} = $args;
 
         $p{$_} = $self->{$_} for grep { defined $self->{$_} } qw(
