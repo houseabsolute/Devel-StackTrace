@@ -9,10 +9,25 @@ use Any::Moose;
 use Carp ();
 use File::Spec;
 
-has [qw( package filename subroutine )] => (
+has [qw( package subroutine )] => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
+);
+
+has _raw_filename => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+    init_arg => 'filename',
+);
+
+has filename => (
+    is       => 'ro',
+    isa      => 'Str',
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub { File::Spec->canonpath( $_[0]->_raw_filename() ) },
 );
 
 has line => (
@@ -113,16 +128,6 @@ has indent => (
     default => 1,
 );
 
-override BUILDARGS => sub {
-    my $class = shift;
-
-    my $p = super();
-
-    $p->{filename} = File::Spec->canonpath( $p->{filename} );
-
-    return $p;
-};
-
 sub as_string {
     my $self  = shift;
     my $first = shift;
@@ -206,6 +211,8 @@ sub as_string {
 
     return "${tab}$sub at " . $self->filename() . ' line ' . $self->line();
 }
+
+__PACKAGE__->meta()->make_immutable();
 
 1;
 
