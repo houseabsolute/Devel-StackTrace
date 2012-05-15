@@ -197,7 +197,14 @@ sub reset_pointer {
 sub frames {
     my $self = shift;
 
-    $self->_make_frames() if $self->{raw};
+    if(@_) {
+        die("Devel::StackTrace->frames() can only take Devel::StackTrace::Frame args\n")
+            if(grep { ! $_->isa('Devel::StackTrace::Frame') } @_);
+        $self->{frames} = \@_;
+    }
+    else {
+        $self->_make_frames() if $self->{raw};
+    }
 
     return @{ $self->{frames} };
 }
@@ -403,8 +410,16 @@ appropriate.
 
 =item * $trace->frames
 
-Returns a list of Devel::StackTrace::Frame objects.  The order they are
-returned is from top (most recent) to bottom.
+Called with no arguments, returns a list of Devel::StackTrace::Frame
+objects.  The order they are returned is from top (most recent) to bottom.
+
+Called with arguments, the list of frames is set to that list.  This is
+useful if you want to filter the list of frames in ways that are more
+complex than can be handled by C<filter_frames>:
+
+  $stacktrace->frames(
+    my_filter( $stacktrace->frames() )
+  );
 
 =item * $trace->frame ($index)
 
