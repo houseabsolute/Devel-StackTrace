@@ -370,7 +370,7 @@ SKIP:
     my $trace = Filter::foo();
 
     my @frames = $trace->frames();
-    is( scalar @frames, 2, 'filtered trace has just 2 frames' );
+    is( scalar @frames, 2, 'frame_filtered trace has just 2 frames' );
     is(
         $frames[0]->subroutine(), 'Devel::StackTrace::new',
         'first subroutine'
@@ -378,6 +378,24 @@ SKIP:
     is(
         $frames[1]->subroutine(), 'Filter::bar',
         'second subroutine (skipped Filter::foo)'
+    );
+}
+
+{
+    my $trace = FilterAllFrames::a_foo();
+
+    my @frames = $trace->frames();
+    is(
+        scalar @frames, 2,
+        'after filtering whole list of frames, got just 2 frames'
+    );
+    is(
+        $frames[0]->subroutine(), 'FilterAllFrames::a_bar',
+        'first subroutine'
+    );
+    is(
+        $frames[1]->subroutine(), 'FilterAllFrames::a_foo',
+        'second subroutine'
     );
 }
 
@@ -511,4 +529,21 @@ sub foo {
 sub bar {
     return Devel::StackTrace->new(
         frame_filter => sub { $_[0]{caller}[3] ne 'Filter::foo' } );
+}
+
+package FilterAllFrames;
+
+sub a_foo { b_foo() }
+sub b_foo { a_bar() }
+sub a_bar { b_bar() }
+
+sub b_bar {
+    my $stacktrace = Devel::StackTrace->new();
+    $stacktrace->frames( only_a_frames( $stacktrace->frames() ) );
+    return $stacktrace;
+}
+
+sub only_a_frames {
+    my @frames = @_;
+    return grep { $_->subroutine() =~ /^FilterAllFrames::a/ } @frames;
 }
