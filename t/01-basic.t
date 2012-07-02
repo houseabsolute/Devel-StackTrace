@@ -321,18 +321,20 @@ SKIP:
         unless $^O eq 'linux';
 
     my $frame = Devel::StackTrace::Frame->new(
-        package    => 'Foo',
-        filename   => 'foo/bar///baz.pm',
-        line       => 10,
-        subroutine => 'bar',
-        has_args   => 1,
-        wantarray  => 1,
-        evaltext   => undef,
-        is_require => '',
-        hints      => 0,
-        bitmask    => 0,
-        hinthash   => undef,
-        args       => [],
+        [
+            'Foo',
+            'foo/bar///baz.pm',
+            10,
+            'bar',
+            1,
+            1,
+            undef,
+            '',
+            0,
+            0,
+            undef,
+        ],
+        [],
     );
 
     is( $frame->filename, 'foo/bar/baz.pm', 'filename is canonicalized' );

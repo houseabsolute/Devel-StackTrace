@@ -128,6 +128,36 @@ has indent => (
     default => 1,
 );
 
+{
+    my @fields = qw(
+        package
+        filename
+        line
+        subroutine
+        has_args
+        wantarray
+        evaltext
+        is_require
+        hints
+        bitmask
+    );
+
+    push @fields, 'hinthash' if $] >= 5.010;
+
+    sub BUILDARGS {
+        my $class = shift;
+
+        return {
+            ( map { $fields[$_] => $_[0]->[$_] } 0 .. $#fields ),
+            args => $_[1],
+            ( defined $_[2] ? ( respect_overload => $_[2] ) : () ),
+            ( defined $_[3] ? ( max_arg_length   => $_[3] ) : () ),
+            ( defined $_[4] ? ( message          => $_[4] ) : () ),
+            ( defined $_[5] ? ( indent           => $_[5] ) : () ),
+        };
+    }
+}
+
 sub as_string {
     my $self  = shift;
     my $first = shift;

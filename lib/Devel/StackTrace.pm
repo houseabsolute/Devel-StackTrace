@@ -186,19 +186,32 @@ sub _make_frame_filter {
         my $c    = shift;
         my $args = shift;
 
-        my %p;
-        @p{@fields} = @{$c};
+        # This ugliness is an optimization to avoid building a hash in this
+        # sub - nytprof says this is faster than other approaches I tried.
+        push @{ $self->{frames} },
+            Devel::StackTrace::Frame->new(
+            $c,
+            $args,
+            $self->{respect_overload},
+            $self->{max_arg_length},
+            $self->{message},
+            $self->{indent}
+            );
 
-        $p{args} = $args;
-
-        $p{$_} = $self->{$_} for grep { defined $self->{$_} } qw(
-            respect_overload
-            max_arg_length
-            message
-            indent
-        );
-
-        push @{ $self->{frames} }, Devel::StackTrace::Frame->new(%p);
+ # Devel::StackTrace::Frame->new(
+ #            ( map { $fields[$_] => $c->[$_] } 0 .. $#fields ),
+ #            args => $args,
+ #            (
+ #                map { $_ => $self->{$_} }
+ #                    grep { defined $self->{$_} }
+ #                    qw(
+ #                    respect_overload
+ #                    max_arg_length
+ #                    message
+ #                    indent
+ #                    )
+ #            )
+ #        );
     }
 }
 
