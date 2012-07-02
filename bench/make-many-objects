@@ -1,0 +1,26 @@
+use strict;
+use warnings;
+
+use v5.14;
+
+use Devel::StackTrace;
+
+say "Version ", ( Devel::StackTrace->VERSION // '<undef>' );
+
+foo()->as_string() for 1 .. 30000;
+
+sub foo {
+    bar( 1, 2 );
+}
+
+sub bar {
+    baz( @_, 3, 4, 5 );
+}
+
+sub baz {
+    quux( {}, [], \( my $x ) );
+}
+
+sub quux {
+    return Devel::StackTrace->new();
+}
