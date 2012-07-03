@@ -219,11 +219,12 @@ sub frame_count {
 
 sub as_string {
     my $self = shift;
+    my $arg  = shift;
 
     my $st    = '';
     my $first = 1;
     foreach my $f ( $self->frames() ) {
-        $st .= $f->as_string($first) . "\n";
+        $st .= $f->as_string($first, $arg) . "\n";
         $first = 0;
     }
 
@@ -416,10 +417,14 @@ first frame is 0 and negative indexes are allowed.
 
 Returns the number of frames in the trace object.
 
-=item * $trace->as_string
+=item * $trace->as_string (\%arg)
 
 Calls as_string on each frame from top to bottom, producing output
 quite similar to the Carp module's cluck/confess methods.
+
+The optional C<\%arg> parameter only has one useful option:  if given,
+C<max_arg_length> will determine how many arguments to each frame's call
+will be dumped.
 
 =back
 
