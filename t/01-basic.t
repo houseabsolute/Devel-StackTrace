@@ -313,6 +313,17 @@ main::max_arg_length('abcdefghij...') called at $test_file_name line 308
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
+
+    my $trace_text_1 = <<"EOF";
+Trace begun at $test_file_name line 1021
+main::max_arg_length('abc...') called at $test_file_name line 308
+EOF
+
+    is(
+      $trace->as_string({ max_arg_length => 3 }),
+      $trace_text_1,
+      'trace text, max_arg_length = 3',
+    );
 }
 
 SKIP:

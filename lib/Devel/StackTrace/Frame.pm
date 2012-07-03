@@ -55,6 +55,7 @@ sub args {
 sub as_string {
     my $self  = shift;
     my $first = shift;
+    my $arg   = shift;
 
     my $sub = $self->subroutine;
 
@@ -103,9 +104,13 @@ sub as_string {
                 local $@;
 
                 eval {
-                    if ( $self->{max_arg_length}
-                        && length $_ > $self->{max_arg_length} ) {
-                        substr( $_, $self->{max_arg_length} ) = '...';
+                    my $max_arg_length = exists $arg->{max_arg_length}
+                                       ? $arg->{max_arg_length}
+                                       : $self->{max_arg_length};
+
+                    if ( $max_arg_length
+                        && length $_ > $max_arg_length ) {
+                        substr( $_, $max_arg_length ) = '...';
                     }
 
                     s/'/\\'/g;

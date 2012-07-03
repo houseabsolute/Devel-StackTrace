@@ -1,3 +1,7 @@
+
+- Allow arguments to a trace's as_string, specifically max_arg_length
+  Patch by Ricardo Signes.
+
 1.27  2011-01-16
 
 - Skip some tests on 5.13.8+ that are no longer relevant because of a change
