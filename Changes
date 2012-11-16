@@ -1,6 +1,8 @@
+{{$NEXT}}
 
-- Allow arguments to a trace's as_string, specifically max_arg_length
+- Allow arguments to a trace's as_string method, specifically max_arg_length
   Patch by Ricardo Signes.
+
 
 1.27  2011-01-16
 
