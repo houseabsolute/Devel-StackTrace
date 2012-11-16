@@ -139,7 +139,7 @@ sub _make_frame_filter {
 sub _add_frame {
     my $self = shift;
     my $c    = shift;
-    my $args = shift;
+    my $p    = shift;
 
     # eval and is_require are only returned when applicable under 5.00503.
     push @$c, ( undef, undef ) if scalar @$c == 6;
@@ -147,7 +147,7 @@ sub _add_frame {
     push @{ $self->{frames} },
         Devel::StackTrace::Frame->new(
         $c,
-        $args,
+        $p,
         $self->{respect_overload},
         $self->{max_arg_length},
         $self->{message},
@@ -219,12 +219,12 @@ sub frame_count {
 
 sub as_string {
     my $self = shift;
-    my $arg  = shift;
+    my $p    = shift;
 
     my $st    = '';
     my $first = 1;
     foreach my $f ( $self->frames() ) {
-        $st .= $f->as_string($first, $arg) . "\n";
+        $st .= $f->as_string( $first, $p ) . "\n";
         $first = 0;
     }
 
@@ -362,8 +362,8 @@ traces, then set this parameter to true.
 
 =item * max_arg_length => $integer
 
-By default, Devel::StackTrace will display the entire argument for
-each subroutine call. Setting this parameter causes it to truncate the
+By default, Devel::StackTrace will display the entire argument for each
+subroutine call. Setting this parameter causes truncates each subroutine
 argument's string representation if it is longer than this number of
 characters.
 
@@ -417,14 +417,14 @@ first frame is 0 and negative indexes are allowed.
 
 Returns the number of frames in the trace object.
 
-=item * $trace->as_string (\%arg)
+=item * $trace->as_string(\%p)
 
 Calls as_string on each frame from top to bottom, producing output
 quite similar to the Carp module's cluck/confess methods.
 
-The optional C<\%arg> parameter only has one useful option:  if given,
-C<max_arg_length> will determine how many arguments to each frame's call
-will be dumped.
+The optional C<\%p> parameter only has one useful option. The
+C<max_arg_length> parameter truncates each subroutine argument's string
+representation if it is longer than this number of characters.
 
 =back
 
