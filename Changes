@@ -3,6 +3,9 @@
 - Allow arguments to a trace's as_string method, specifically max_arg_length
   Patch by Ricardo Signes.
 
+- Added a no_args option to the constructor in 1.26 but forgot to mention it
+  in Changes. Requested by Scott J. Miller. RT #71482.
+
 
 1.27  2011-01-16
 
