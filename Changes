@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+- The Devel::StackTrace->frames() method is now read-write. This allows you to
+  do more complex filtering of frames than is easily possible with the
+  frame_filter argument to the constructor. Patch by David Cantrell.
+
+
 1.28   2012-11-16
 
 - Allow arguments to a trace's as_string method, specifically max_arg_length
