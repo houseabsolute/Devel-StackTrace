@@ -110,7 +110,7 @@ sub _make_frame_filter {
         local $SIG{__DIE__};
 
         $self->{ignore_package} = [ $self->{ignore_package} ]
-            unless eval { @{ $self->{ignore_package} } };
+            unless UNIVERSAL::isa( $self->{ignore_package}, 'ARRAY' );
 
         @i_pack_re
             = map { ref $_ ? $_ : qr/^\Q$_\E$/ } @{ $self->{ignore_package} };
