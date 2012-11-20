@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+1.30   2012-11-19
+
 - There was an eval which did not first localize $@ and $SIG{__DIE__}. This
   broke Plack::Middleware::StackTrace (and possibly other tihngs).
 
