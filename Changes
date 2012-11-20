@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+- There was an eval which did not first localize $@ and $SIG{__DIE__}. This
+  broke Plack::Middleware::StackTrace (and possibly other tihngs).
+
+
 1.29   2012-11-16
 
 - The Devel::StackTrace->frames() method is now read-write. This allows you to

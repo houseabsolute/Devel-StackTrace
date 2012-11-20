@@ -106,6 +106,9 @@ sub _make_frame_filter {
 
     my ( @i_pack_re, %i_class );
     if ( $self->{ignore_package} ) {
+        local $@;
+        local $SIG{__DIE__};
+
         $self->{ignore_package} = [ $self->{ignore_package} ]
             unless eval { @{ $self->{ignore_package} } };
 
