@@ -321,7 +321,7 @@ Takes the following parameters:
 =item * frame_filter => $sub
 
 By default, Devel::StackTrace will include all stack frames before the
-call to its its constructor.
+call to its constructor.
 
 However, you may want to filter out some frames with more granularity
 than 'ignore_package' or 'ignore_class' allow.
@@ -421,7 +421,7 @@ L<Devel::StackTrace::Frame> objects. They are returned in order from top (most
 recent) to bottom.
 
 This method can also be used to set the object's frames if you pass it a list
-of L<Devel::StackTrace::Frame> objects objects.
+of L<Devel::StackTrace::Frame> objects.
 
 This is useful if you want to filter the list of frames in ways that are more
 complex than can be handled by C<filter_frames>:
