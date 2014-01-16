@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+- No code changes, just doc updates, including documenting the as_string()
+  method in Devel::StackTrace::Frame. Requested by Skef. RT #91575.
+
+
 1.30   2012-11-19
 
 - There was an eval which did not first localize $@ and $SIG{__DIE__}. This
