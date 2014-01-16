@@ -396,7 +396,7 @@ tab character, just like C<Carp::confess()>.
 
 =head2 $trace->next_frame()
 
-Returns the next L<Devel::StackTrace::Frame object> on the stack, going
+Returns the next L<Devel::StackTrace::Frame> object on the stack, going
 down. If this method hasn't been called before it returns the first frame. It
 returns C<undef> when it reaches the bottom of the stack and then resets its
 pointer so the next call to C<< $trace->next_frame() >> or C<<

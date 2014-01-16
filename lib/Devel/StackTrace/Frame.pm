@@ -149,6 +149,8 @@ __END__
 
 =pod
 
+=for Pod::Coverage new
+
 =head1 DESCRIPTION
 
 See L<Devel::StackTrace> for details.
