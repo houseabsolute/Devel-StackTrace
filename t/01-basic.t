@@ -241,8 +241,8 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 
 {
     {
-
-        package FooBarBaz;
+        package    #hide
+            FooBarBaz;
 
         sub func2 {
             return Devel::StackTrace->new( ignore_package => qr/^FooBar/ );
@@ -258,10 +258,10 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 }
 
 {
+    package    #hide
+        StringOverloaded;
 
-    package StringOverloaded;
-
-    use overload '""' => sub {'overloaded'};
+    use overload '""' => sub { 'overloaded' };
 }
 
 {
@@ -287,8 +287,8 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 }
 
 {
-
-    package BlowOnCan;
+    package    #hide
+        BlowOnCan;
 
     sub can { die 'foo' }
 }
@@ -433,117 +433,144 @@ sub overload_no_stringify {
     return Devel::StackTrace->new( no_refs => 1, respect_overload => 1 );
 }
 
-package Test;
+{
+    package    #hide
+        Test;
 
-sub foo {
-    trace(@_);
+    sub foo {
+        trace(@_);
+    }
+
+    sub trace {
+        Devel::StackTrace->new(@_);
+    }
 }
 
-sub trace {
-    Devel::StackTrace->new(@_);
+{
+    package    #hide
+        SubTest;
+
+    use base qw(Test);
+
+    sub foo {
+        trace(@_);
+    }
+
+    sub trace {
+        Devel::StackTrace->new(@_);
+    }
 }
 
-package SubTest;
+{
+    package    #hide
+        RefTest;
 
-use base qw(Test);
+    sub new {
+        my $self = bless {}, shift;
 
-sub foo {
-    trace(@_);
+        $self->{trace} = trace($self);
+
+        return $self;
+    }
+
+    sub trace {
+        Devel::StackTrace->new();
+    }
 }
 
-sub trace {
-    Devel::StackTrace->new(@_);
+{
+    package    #hide
+        RefTest2;
+
+    sub new {
+        my $self = bless {}, shift;
+
+        $self->{trace} = trace($self);
+
+        return $self;
+    }
+
+    sub trace {
+        Devel::StackTrace->new( no_refs => 1 );
+    }
 }
 
-package RefTest;
+{
+    package    #hide
+        RefTest3;
 
-sub new {
-    my $self = bless {}, shift;
+    sub new {
+        my $self = bless {}, shift;
 
-    $self->{trace} = trace($self);
+        $self->{trace} = trace($self);
 
-    return $self;
+        return $self;
+    }
+
+    sub trace {
+        Devel::StackTrace->new( no_object_refs => 1 );
+    }
 }
 
-sub trace {
-    Devel::StackTrace->new();
+{
+    package    #hide
+        RefTest4;
+
+    sub new {
+        my $self = bless {}, shift;
+
+        $self->{trace} = trace( $self, 'not a ref' );
+
+        return $self;
+    }
+
+    sub trace {
+        Devel::StackTrace->new( no_refs => 1 );
+    }
 }
 
-package RefTest2;
+{
+    package    #hide
+        CodeOverload;
 
-sub new {
-    my $self = bless {}, shift;
+    use overload '&{}' => sub { 'foo' };
 
-    $self->{trace} = trace($self);
-
-    return $self;
+    sub new {
+        my $class = shift;
+        return bless {}, $class;
+    }
 }
 
-sub trace {
-    Devel::StackTrace->new( no_refs => 1 );
+{
+    package    #hide
+        Filter;
+
+    sub foo {
+        bar();
+    }
+
+    sub bar {
+        return Devel::StackTrace->new(
+            frame_filter => sub { $_[0]{caller}[3] ne 'Filter::foo' } );
+    }
 }
 
-package RefTest3;
+{
+    package    #hide
+        FilterAllFrames;
 
-sub new {
-    my $self = bless {}, shift;
+    sub a_foo { b_foo() }
+    sub b_foo { a_bar() }
+    sub a_bar { b_bar() }
 
-    $self->{trace} = trace($self);
+    sub b_bar {
+        my $stacktrace = Devel::StackTrace->new();
+        $stacktrace->frames( only_a_frames( $stacktrace->frames() ) );
+        return $stacktrace;
+    }
 
-    return $self;
-}
-
-sub trace {
-    Devel::StackTrace->new( no_object_refs => 1 );
-}
-
-package RefTest4;
-
-sub new {
-    my $self = bless {}, shift;
-
-    $self->{trace} = trace( $self, 'not a ref' );
-
-    return $self;
-}
-
-sub trace {
-    Devel::StackTrace->new( no_refs => 1 );
-}
-
-package CodeOverload;
-
-use overload '&{}' => sub {'foo'};
-
-sub new {
-    my $class = shift;
-    return bless {}, $class;
-}
-
-package Filter;
-
-sub foo {
-    bar();
-}
-
-sub bar {
-    return Devel::StackTrace->new(
-        frame_filter => sub { $_[0]{caller}[3] ne 'Filter::foo' } );
-}
-
-package FilterAllFrames;
-
-sub a_foo { b_foo() }
-sub b_foo { a_bar() }
-sub a_bar { b_bar() }
-
-sub b_bar {
-    my $stacktrace = Devel::StackTrace->new();
-    $stacktrace->frames( only_a_frames( $stacktrace->frames() ) );
-    return $stacktrace;
-}
-
-sub only_a_frames {
-    my @frames = @_;
-    return grep { $_->subroutine() =~ /^FilterAllFrames::a/ } @frames;
+    sub only_a_frames {
+        my @frames = @_;
+        return grep { $_->subroutine() =~ /^FilterAllFrames::a/ } @frames;
+    }
 }
