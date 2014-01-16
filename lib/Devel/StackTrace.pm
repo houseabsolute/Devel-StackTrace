@@ -256,43 +256,45 @@ sub as_string {
 
 __END__
 
+=pod
+
 =head1 SYNOPSIS
 
   use Devel::StackTrace;
 
-  my $trace = Devel::StackTrace->new;
+  my $trace = Devel::StackTrace->new();
 
-  print $trace->as_string; # like carp
+  print $trace->as_string(); # like carp
 
   # from top (most recent) of stack to bottom.
-  while (my $frame = $trace->next_frame) {
-      print "Has args\n" if $frame->hasargs;
+  while ( my $frame = $trace->next_frame() ) {
+      print "Has args\n" if $frame->hasargs();
   }
 
   # from bottom (least recent) of stack to top.
-  while (my $frame = $trace->prev_frame) {
-      print "Sub: ", $frame->subroutine, "\n";
+  while ( my $frame = $trace->prev_frame() ) {
+      print "Sub: ", $frame->subroutine(), "\n";
   }
 
 =head1 DESCRIPTION
 
-The Devel::StackTrace module contains two classes, Devel::StackTrace
-and Devel::StackTrace::Frame.  The goal of this object is to encapsulate
-the information that can found through using the caller() function, as
-well as providing a simple interface to this data.
+The C<Devel::StackTrace> module contains two classes, C,Devel::StackTrace> and
+L<Devel::StackTrace::Frame>. These objects encapsulate the information that
+can retrieved via Perl's C<caller()> function, as well as providing a simple
+interface to this data.
 
-The Devel::StackTrace object contains a set of Devel::StackTrace::Frame
-objects, one for each level of the stack.  The frames contain all the
-data available from C<caller()>.
+The C<Devel::StackTrace> object contains a set of C<Devel::StackTrace::Frame>
+objects, one for each level of the stack. The frames contain all the data
+available from C<caller()>.
 
-This code was created to support my L<Exception::Class::Base> class
-(part of Exception::Class) but may be useful in other contexts.
+This code was created to support my L<Exception::Class::Base> class (part of
+L<Exception::Class>) but may be useful in other contexts.
 
 =head1 'TOP' AND 'BOTTOM' OF THE STACK
 
-When describing the methods of the trace object, I use the words 'top'
-and 'bottom'.  In this context, the 'top' frame on the stack is the
-most recent frame and the 'bottom' is the least recent.
+When describing the methods of the trace object, I use the words 'top' and
+'bottom'. In this context, the 'top' frame on the stack is the most recent
+frame and the 'bottom' is the least recent.
 
 Here's an example:
 
@@ -303,20 +305,20 @@ Here's an example:
   }
 
   sub bar {
-     Devel::StackTrace->new;  # top frame is here.
+     Devel::StackTrace->new();  # top frame is here.
   }
 
-=head1 Devel::StackTrace METHODS
+=head1 METHODS
 
-=over 4
+This class provide the following methods:
 
-=item * Devel::StackTrace->new(%named_params)
+=head2 Devel::StackTrace->new(%named_params)
 
 Returns a new Devel::StackTrace object.
 
 Takes the following parameters:
 
-=over 8
+=over 4
 
 =item * frame_filter => $sub
 
@@ -347,13 +349,13 @@ Any frames where the package is a subclass of one of these packages
 
 Devel::StackTrace internally adds itself to the 'ignore_package'
 parameter, meaning that the Devel::StackTrace package is B<ALWAYS>
-ignored.  However, if you create a subclass of Devel::StackTrace it
+ignored. However, if you create a subclass of Devel::StackTrace it
 will not be ignored.
 
 =item * no_refs => $boolean
 
 If this parameter is true, then Devel::StackTrace will not store
-references internally when generating stacktrace frames.  This lets
+references internally when generating stacktrace frames. This lets
 your objects go out of scope.
 
 Devel::StackTrace replaces any references with their stringified
@@ -368,7 +370,7 @@ arguments in stack trace frames at all.
 
 By default, Devel::StackTrace will call C<overload::AddrRef()> to get
 the underlying string representation of an object, instead of
-respecting the object's stringification overloading.  If you would
+respecting the object's stringification overloading. If you would
 prefer to see the overloaded representation of objects in stack
 traces, then set this parameter to true.
 
@@ -392,29 +394,29 @@ tab character, just like C<Carp::confess()>.
 
 =back
 
-=item * $trace->next_frame
+=head2 $trace->next_frame()
 
-Returns the next Devel::StackTrace::Frame object down on the stack.  If
-it hasn't been called before it returns the first frame.  It returns
-undef when it reaches the bottom of the stack and then resets its
-pointer so the next call to C<next_frame> or C<prev_frame> will work
-properly.
+Returns the next L<Devel::StackTrace::Frame object> on the stack, going
+down. If this method hasn't been called before it returns the first frame. It
+returns C<undef> when it reaches the bottom of the stack and then resets its
+pointer so the next call to C<< $trace->next_frame() >> or C<<
+$trace->prev_frame() >> will work properly.
 
-=item * $trace->prev_frame
+=head2 $trace->prev_frame()
 
-Returns the next Devel::StackTrace::Frame object up on the stack.  If it
-hasn't been called before it returns the last frame.  It returns undef
-when it reaches the top of the stack and then resets its pointer so
-pointer so the next call to C<next_frame> or C<prev_frame> will work
-properly.
+Returns the next L<Devel::StackTrace::Frame> object on the stack, going up. If
+this method hasn't been called before it returns the last frame. It returns
+undef when it reaches the top of the stack and then resets its pointer so the
+next call to C<< $trace->next_frame() >> or C<< $trace->prev_frame() >> will
+work properly.
 
-=item * $trace->reset_pointer
+=head2 $trace->reset_pointer
 
-Resets the pointer so that the next call C<next_frame> or
-C<prev_frame> will start at the top or bottom of the stack, as
+Resets the pointer so that the next call to C<< $trace->next_frame() >> or C<<
+$trace->prev_frame() >> will start at the top or bottom of the stack, as
 appropriate.
 
-=item * $trace->frames
+=head2 $trace->frames()
 
 When this method is called with no arguments, it returns a list of
 L<Devel::StackTrace::Frame> objects. They are returned in order from top (most
@@ -424,30 +426,28 @@ This method can also be used to set the object's frames if you pass it a list
 of L<Devel::StackTrace::Frame> objects.
 
 This is useful if you want to filter the list of frames in ways that are more
-complex than can be handled by C<filter_frames>:
+complex than can be handled by the C<< $trace->filter_frames() >> method:
 
   $stacktrace->frames( my_filter( $stacktrace->frames() ) );
 
-=item * $trace->frame ($index)
+=head2 $trace->frame($index)
 
-Given an index, returns the relevant frame or undef if there is not
-frame at that index.  The index is exactly like a Perl array.  The
-first frame is 0 and negative indexes are allowed.
+Given an index, this method returns the relevant frame, or undef if there is
+no frame at that index. The index is exactly like a Perl array. The first
+frame is 0 and negative indexes are allowed.
 
-=item * $trace->frame_count
+=head2 $trace->frame_count()
 
 Returns the number of frames in the trace object.
 
-=item * $trace->as_string(\%p)
+=head2 $trace->as_string(\%p)
 
-Calls as_string on each frame from top to bottom, producing output
-quite similar to the Carp module's cluck/confess methods.
+Calls C<< $frame->as_string() >> on each frame from top to bottom, producing
+output quite similar to the Carp module's cluck/confess methods.
 
-The optional C<\%p> parameter only has one useful option. The
-C<max_arg_length> parameter truncates each subroutine argument's string
-representation if it is longer than this number of characters.
-
-=back
+The optional C<\%p> parameter only has one option. The C<max_arg_length>
+parameter truncates each subroutine argument's string representation if it is
+longer than this number of characters.
 
 =head1 SUPPORT
 

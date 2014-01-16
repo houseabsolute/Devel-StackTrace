@@ -147,48 +147,48 @@ sub as_string {
 
 __END__
 
+=pod
+
 =head1 DESCRIPTION
 
 See L<Devel::StackTrace> for details.
 
 =head1 METHODS
 
-See the L<caller> documentation for more information on what these
+See Perl's C<caller()> documentation for more information on what these
 methods return.
 
-=over 4
+=head2 $frame->package()
 
-=item * $frame->package
+=head2 $frame->filename()
 
-=item * $frame->filename
+=head2 $frame->line()
 
-=item * $frame->line
+=head2 $frame->subroutine()
 
-=item * $frame->subroutine
+=head2 $frame->hasargs()
 
-=item * $frame->hasargs
+=head2 $frame->wantarray()
 
-=item * $frame->wantarray
-
-=item * $frame->evaltext
+=head2 $frame->evaltext()
 
 Returns undef if the frame was not part of an eval.
 
-=item * $frame->is_require
+=head2 $frame->is_require()
 
 Returns undef if the frame was not part of a require.
 
-=item * $frame->args
+=head2 $frame->args()
 
 Returns the arguments passed to the frame.  Note that any arguments
 that are references are returned as references, not copies.
 
-=item * $frame->hints
+=head2 $frame->hints()
 
-=item * $frame->bitmask
+=head2 $frame->bitmask()
 
-=item * $frame->as_string
+=head2 $frame->as_string()
 
 Returns a string containing a description of the frame.
 
-=back
+=cut
