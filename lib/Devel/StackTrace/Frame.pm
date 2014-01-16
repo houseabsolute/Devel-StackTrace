@@ -187,4 +187,8 @@ that are references are returned as references, not copies.
 
 =item * $frame->bitmask
 
+=item * $frame->as_string
+
+Returns a string containing a description of the frame.
+
 =back
