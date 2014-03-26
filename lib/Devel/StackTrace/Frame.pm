@@ -182,8 +182,8 @@ Returns undef if the frame was not part of a require.
 
 =head2 $frame->args()
 
-Returns the arguments passed to the frame.  Note that any arguments
-that are references are returned as references, not copies.
+Returns the arguments passed to the frame.  Note that any arguments that are
+references are returned as references, not copies.
 
 =head2 $frame->hints()
 
