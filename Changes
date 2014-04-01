@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+- Add filter_frames_early option to filter frames before stringifying args.
+
 1.31   2014-01-16
 
 - No code changes, just doc updates, including documenting the as_string()
