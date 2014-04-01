@@ -37,6 +37,8 @@ sub new {
 sub _record_caller_data {
     my $self = shift;
 
+    my $filter = $self->{filter_frames_early} && $self->_make_frame_filter();
+
     # We exclude this method by starting one frame back.
     my $x = 1;
     while (
@@ -53,19 +55,20 @@ sub _record_caller_data {
 
         my @args;
 
-        unless ( $self->{no_args} ) {
-            @args = @DB::args;
+        @args = $self->{no_args} ? () : @DB::args;
 
-            if ( $self->{no_refs} ) {
-                @args = map { ref $_ ? $self->_ref_to_string($_) : $_ } @args;
-            }
+        my $raw = {
+            caller => \@c,
+            args => \@args,
+        };
+
+        next if $filter && !$filter->($raw);
+
+        if ( $self->{no_refs} ) {
+            $raw->{args} = [ map { ref $_ ? $self->_ref_to_string($_) : $_ } @{$raw->{args}} ];
         }
 
-        push @{ $self->{raw} },
-            {
-            caller => \@c,
-            args   => \@args,
-            };
+        push @{ $self->{raw} }, $raw;
     }
 }
 
@@ -89,11 +92,11 @@ sub _ref_to_string {
 sub _make_frames {
     my $self = shift;
 
-    my $filter = $self->_make_frame_filter;
+    my $filter = !$self->{filter_frames_early} && $self->_make_frame_filter();
 
     my $raw = delete $self->{raw};
     for my $r ( @{$raw} ) {
-        next unless $filter->($r);
+        next if $filter && ! $filter->($r);
 
         $self->_add_frame( $r->{caller}, $r->{args} );
     }
@@ -336,6 +339,16 @@ key are the subroutine arguments found in C<@DB::args>.
 
 The filter should return true if the frame should be included, or
 false if it should be skipped.
+
+=item * filter_frames_early => $boolean
+
+If this parameter is true, C<frame_filter> will be called as soon as the
+stacktrace is created, and before refs are stringified (if C<no_refs> is
+true), rather than being filtered lazily when L<Devel::StackTrace::Frame>
+objects are first needed.
+
+This is useful if you want to filter based on the frame's arguments and want
+to be able to examine object properties, for example.
 
 =item * ignore_package => $package_name OR \@package_names
 
