@@ -39,8 +39,9 @@ sub _record_caller_data {
 
     my $filter = $self->{filter_frames_early} && $self->_make_frame_filter();
 
-    # We exclude this method by starting one frame back.
-    my $x = 1;
+    # We exclude this method by starting at least one frame back.
+    my $x = 1 + ( $self->{skip_frames} // 0 );
+
     while (
         my @c
         = $self->{no_args}
@@ -364,6 +365,13 @@ Devel::StackTrace internally adds itself to the 'ignore_package'
 parameter, meaning that the Devel::StackTrace package is B<ALWAYS>
 ignored. However, if you create a subclass of Devel::StackTrace it
 will not be ignored.
+
+=item * skip_frames => $integer
+
+This will cause this number of stack frames to be excluded from top of the
+stack trace. This prevents the frames from being captured at all, and applies
+before the C<frame_filter>, C<ignore_package>, or C<ignore_class> options,
+even with C<filter_frames_early>.
 
 =item * no_refs => $boolean
 
