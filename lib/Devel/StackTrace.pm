@@ -40,7 +40,7 @@ sub _record_caller_data {
     my $filter = $self->{filter_frames_early} && $self->_make_frame_filter();
 
     # We exclude this method by starting at least one frame back.
-    my $x = 1 + ( $self->{skip_frames} // 0 );
+    my $x = 1 + ( $self->{skip_frames} || 0 );
 
     while (
         my @c

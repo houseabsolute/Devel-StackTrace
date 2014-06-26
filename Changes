@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+- Fixed use of // operator (my use, not Graham's) in previous release.
+
+
 1.33   2014-06-26
 
 - Added a skip_frames option. This causes the stack trace to skip an arbitrary
