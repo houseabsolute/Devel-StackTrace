@@ -17,10 +17,12 @@ sub new {
     my $class = shift;
     my %p     = @_;
 
-    # Backwards compatibility - this parameter was renamed to no_refs
-    # ages ago.
+    # Backwards compatibility - this parameter was renamed to no_refs, then
+    # to unsafe_ref_capture but with reversed behavior.
     $p{no_refs} = delete $p{no_object_refs}
         if exists $p{no_object_refs};
+    $p{unsafe_ref_capture} = ! delete $p{no_refs}
+        if exists $p{no_refs};
 
     my $self = bless {
         index  => undef,
@@ -65,8 +67,9 @@ sub _record_caller_data {
 
         next if $filter && !$filter->($raw);
 
-        if ( $self->{no_refs} ) {
-            $raw->{args} = [ map { ref $_ ? $self->_ref_to_string($_) : $_ } @{$raw->{args}} ];
+        unless ( $self->{unsafe_ref_capture} ) {
+            $raw->{args} = [ map { ref $_ ? $self->_ref_to_string($_) : $_ }
+                    @{ $raw->{args} } ];
         }
 
         push @{ $self->{raw} }, $raw;
@@ -344,9 +347,9 @@ false if it should be skipped.
 =item * filter_frames_early => $boolean
 
 If this parameter is true, C<frame_filter> will be called as soon as the
-stacktrace is created, and before refs are stringified (if C<no_refs> is
-true), rather than being filtered lazily when L<Devel::StackTrace::Frame>
-objects are first needed.
+stacktrace is created, and before refs are stringified (if
+C<unsafe_ref_capture> is not set), rather than being filtered lazily when
+L<Devel::StackTrace::Frame> objects are first needed.
 
 This is useful if you want to filter based on the frame's arguments and want
 to be able to examine object properties, for example.
@@ -373,13 +376,18 @@ stack trace. This prevents the frames from being captured at all, and applies
 before the C<frame_filter>, C<ignore_package>, or C<ignore_class> options,
 even with C<filter_frames_early>.
 
-=item * no_refs => $boolean
+=item * unsafe_ref_capture => $boolean
 
-If this parameter is true, then Devel::StackTrace will not store
-references internally when generating stacktrace frames. This lets
-your objects go out of scope.
+If this parameter is true, then Devel::StackTrace will store
+references internally when generating stacktrace frames.
 
-Devel::StackTrace replaces any references with their stringified
+B<This option is very dangerous, and should never be used with exception
+objects>. Using this option will keep any objects or references alive past
+their normal lifetime, until the stack trace object goes out of scope. It can
+keep objects alive even after their C<DESTROY> sub is called, resulting it it
+being called multiple times on the same object.
+
+If not set, Devel::StackTrace replaces any references with their stringified
 representation.
 
 =item * no_args => $boolean
