@@ -7,10 +7,7 @@ _build
 .build
 MANIFEST
 META.yml
-Makefile.PL
-README
 Debian_CPANTS.txt
-Makefile.PL
 Makefile
 Makefile.old
 pm_to_blib*
