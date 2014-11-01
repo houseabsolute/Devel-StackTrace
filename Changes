@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.00   2014-11-01
+
 [BACKWARDS INCOMPATIBILITIES]
 
 - The no_refs constructor parameter is now deprecated, and has been replace by
