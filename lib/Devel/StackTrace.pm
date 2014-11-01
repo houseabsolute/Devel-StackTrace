@@ -247,7 +247,8 @@ sub as_string {
 }
 
 {
-    package Devel::StackTraceFrame;
+    package    # hide from PAUSE
+        Devel::StackTraceFrame;
 
     our @ISA = 'Devel::StackTrace::Frame';
 }
