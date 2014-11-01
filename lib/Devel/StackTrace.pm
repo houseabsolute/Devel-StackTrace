@@ -17,11 +17,7 @@ sub new {
     my $class = shift;
     my %p     = @_;
 
-    # Backwards compatibility - this parameter was renamed to no_refs, then
-    # to unsafe_ref_capture but with reversed behavior.
-    $p{no_refs} = delete $p{no_object_refs}
-        if exists $p{no_object_refs};
-    $p{unsafe_ref_capture} = ! delete $p{no_refs}
+    $p{unsafe_ref_capture} = !delete $p{no_refs}
         if exists $p{no_refs};
 
     my $self = bless {
@@ -62,7 +58,7 @@ sub _record_caller_data {
 
         my $raw = {
             caller => \@c,
-            args => \@args,
+            args   => \@args,
         };
 
         next if $filter && !$filter->($raw);
@@ -100,7 +96,7 @@ sub _make_frames {
 
     my $raw = delete $self->{raw};
     for my $r ( @{$raw} ) {
-        next if $filter && ! $filter->($r);
+        next if $filter && !$filter->($r);
 
         $self->_add_frame( $r->{caller}, $r->{args} );
     }
@@ -251,8 +247,7 @@ sub as_string {
 }
 
 {
-    package
-        Devel::StackTraceFrame;
+    package Devel::StackTraceFrame;
 
     our @ISA = 'Devel::StackTrace::Frame';
 }

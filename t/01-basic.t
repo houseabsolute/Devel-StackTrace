@@ -207,24 +207,6 @@ EOF
     isa_ok( $args[0], 'RefTestDep1' );
 }
 
-# Storing references (deprecated interface 2)
-{
-    my $obj = RefTestDep2->new;
-
-    my $trace = $obj->{trace};
-
-    my $call_to_trace = ( $trace->frames )[1];
-
-    my @args = $call_to_trace->args;
-
-    is(
-        scalar @args, 1,
-        "Only one argument should have been passed in the call to trace()"
-    );
-
-    isa_ok( $args[0], 'RefTestDep2' );
-}
-
 # No ref to Exception::Class::Base object without refs
 if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 {
@@ -324,14 +306,14 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1021
-main::max_arg_length('abcdefghij...') called at $test_file_name line 323
+main::max_arg_length('abcdefghij...') called at $test_file_name line 305
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
 
     my $trace_text_1 = <<"EOF";
 Trace begun at $test_file_name line 1021
-main::max_arg_length('abc...') called at $test_file_name line 323
+main::max_arg_length('abc...') called at $test_file_name line 305
 EOF
 
     is(
@@ -524,23 +506,6 @@ sub overload_no_stringify {
 
     sub trace {
         Devel::StackTrace->new( no_refs => 0 );
-    }
-}
-
-{
-    package    #hide
-        RefTestDep2;
-
-    sub new {
-        my $self = bless {}, shift;
-
-        $self->{trace} = trace($self);
-
-        return $self;
-    }
-
-    sub trace {
-        Devel::StackTrace->new( no_object_refs => 0 );
     }
 }
 
