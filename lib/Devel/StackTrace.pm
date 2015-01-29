@@ -283,12 +283,12 @@ __END__
 
 =head1 DESCRIPTION
 
-The C<Devel::StackTrace> module contains two classes, C,Devel::StackTrace> and
+The C<Devel::StackTrace> module contains two classes, L<Devel::StackTrace> and
 L<Devel::StackTrace::Frame>. These objects encapsulate the information that
 can retrieved via Perl's C<caller()> function, as well as providing a simple
 interface to this data.
 
-The C<Devel::StackTrace> object contains a set of C<Devel::StackTrace::Frame>
+The L<Devel::StackTrace> object contains a set of L<Devel::StackTrace::Frame>
 objects, one for each level of the stack. The frames contain all the data
 available from C<caller()>.
 
