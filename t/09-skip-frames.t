@@ -13,16 +13,16 @@ use Devel::StackTrace;
     my $cnt = scalar @f;
     is(
         $cnt, 2,
-        "Trace should have 2 frames"
+        'Trace should have 2 frames'
     );
 
     is(
         $f[0]->subroutine, 'main::bar',
-        "First frame subroutine should be main::bar"
+        'First frame subroutine should be main::bar'
     );
     is(
         $f[1]->subroutine, 'main::baz',
-        "First frame subroutine should be main::baz"
+        'Second frame subroutine should be main::baz'
     );
 }
 

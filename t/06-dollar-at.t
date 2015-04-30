@@ -5,6 +5,7 @@ use Test::More;
 
 use Devel::StackTrace;
 
+## no critic (Variables::RequireLocalizedPunctuationVars)
 {
     $@ = my $msg = q{Don't tread on me};
 

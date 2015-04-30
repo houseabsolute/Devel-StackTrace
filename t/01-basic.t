@@ -18,7 +18,7 @@ my $test_file_name = get_file_name();
     my $cnt = scalar @f;
     is(
         $cnt, 4,
-        "Trace should have 4 frames"
+        'Trace should have 4 frames'
     );
 
     @f = ();
@@ -27,12 +27,12 @@ my $test_file_name = get_file_name();
     $cnt = scalar @f;
     is(
         $cnt, 4,
-        "Trace should have 4 frames"
+        'Trace should have 4 frames'
     );
 
     is(
         $f[0]->package, 'main',
-        "First frame package should be main"
+        'First frame package should be main'
     );
 
     is(
@@ -40,18 +40,18 @@ my $test_file_name = get_file_name();
         "First frame filename should be $test_file_name"
     );
 
-    is( $f[0]->line, 1009, "First frame line should be 1009" );
+    is( $f[0]->line, 1009, 'First frame line should be 1009' );
 
     is(
         $f[0]->subroutine, 'Devel::StackTrace::new',
-        "First frame subroutine should be Devel::StackTrace::new"
+        'First frame subroutine should be Devel::StackTrace::new'
     );
 
-    is( $f[0]->hasargs, 1, "First frame hasargs should be true" );
+    is( $f[0]->hasargs, 1, 'First frame hasargs should be true' );
 
     ok(
         !$f[0]->wantarray,
-        "First frame wantarray should be false"
+        'First frame wantarray should be false'
     );
 
     my $trace_text = <<"EOF";
@@ -73,11 +73,11 @@ EOF
 
     my $cnt = scalar @f;
 
-    is( $cnt, 1, "Trace should have 1 frame" );
+    is( $cnt, 1, 'Trace should have 1 frame' );
 
     is(
         $f[0]->package, 'main',
-        "The package for this frame should be main"
+        'The package for this frame should be main'
     );
 
     $trace = Test::foo( ignore_class => 'Test' );
@@ -87,10 +87,10 @@ EOF
 
     $cnt = scalar @f;
 
-    is( $cnt, 1, "Trace should have 1 frame" );
+    is( $cnt, 1, 'Trace should have 1 frame' );
     is(
         $f[0]->package, 'main',
-        "The package for this frame should be main"
+        'The package for this frame should be main'
     );
 }
 
@@ -113,14 +113,14 @@ EOF
 
     is(
         $trace->frame_count, 4,
-        "Trace should have 4 frames"
+        'Trace should have 4 frames'
     );
 
     my $f = $trace->frame(2);
 
     is(
         $f->subroutine, 'main::bar',
-        "Frame 2's subroutine should be 'main::bar'"
+        q{Frame 2's subroutine should be 'main::bar'}
     );
 
     $trace->next_frame;
@@ -130,23 +130,23 @@ EOF
     $f = $trace->next_frame;
     is(
         $f->subroutine, 'Devel::StackTrace::new',
-        "next_frame should return first frame after call to reset_pointer"
+        'next_frame should return first frame after call to reset_pointer'
     );
 
     my @f = $trace->frames;
     is(
         scalar @f, 4,
-        "frames method should return four frames"
+        'frames method should return four frames'
     );
 
     is(
         $f[0]->subroutine, 'Devel::StackTrace::new',
-        "first frame's subroutine should be Devel::StackTrace::new"
+        q{first frame's subroutine should be Devel::StackTrace::new}
     );
 
     is(
         $f[3]->subroutine, 'main::foo',
-        "last frame's subroutine should be main::foo"
+        q{last frame's subroutine should be main::foo}
     );
 }
 
@@ -162,12 +162,12 @@ EOF
 
     is(
         scalar @args, 1,
-        "Only one argument should have been passed in the call to trace()"
+        'Only one argument should have been passed in the call to trace()'
     );
 
     like(
         $args[0], qr/RefTest=HASH/,
-        "Actual object should be replaced by string 'RefTest=HASH'"
+        q{Actual object should be replaced by string 'RefTest=HASH'}
     );
 }
 
@@ -183,7 +183,7 @@ EOF
 
     is(
         scalar @args, 1,
-        "Only one argument should have been passed in the call to trace()"
+        'Only one argument should have been passed in the call to trace()'
     );
 
     isa_ok( $args[0], 'RefTest2' );
@@ -201,7 +201,7 @@ EOF
 
     is(
         scalar @args, 1,
-        "Only one argument should have been passed in the call to trace()"
+        'Only one argument should have been passed in the call to trace()'
     );
 
     isa_ok( $args[0], 'RefTestDep1' );
@@ -210,6 +210,7 @@ EOF
 # No ref to Exception::Class::Base object without refs
 if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 {
+    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     eval {
         Exception::Class::Base->throw(
             error      => 'error',
@@ -254,11 +255,12 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
     is( scalar @f, 1, 'check regex as ignore_package arg' );
 }
 
+## no critic (Modules::ProhibitMultiplePackages)
 {
     package    #hide
         StringOverloaded;
 
-    use overload '""' => sub { 'overloaded' };
+    use overload q{""} => sub {'overloaded'};
 }
 
 {
@@ -306,14 +308,14 @@ if ( $Exception::Class::VERSION && $Exception::Class::VERSION >= 1.09 )
 
     my $trace_text = <<"EOF";
 Trace begun at $test_file_name line 1021
-main::max_arg_length('abcdefghij...') called at $test_file_name line 305
+main::max_arg_length('abcdefghij...') called at $test_file_name line 307
 EOF
 
     is( $trace->as_string, $trace_text, 'trace text' );
 
     my $trace_text_1 = <<"EOF";
 Trace begun at $test_file_name line 1021
-main::max_arg_length('abc...') called at $test_file_name line 305
+main::max_arg_length('abc...') called at $test_file_name line 307
 EOF
 
     is(
@@ -325,11 +327,11 @@ EOF
 
 SKIP:
 {
-    skip "Test only runs on Linux", 1
+    skip 'Test only runs on Linux', 1
         unless $^O eq 'linux';
 
     my $frame = Devel::StackTrace::Frame->new(
-        [ 'Foo', 'foo/bar///baz.pm', 10, 'bar', 1, 1, '', 0 ],
+        [ 'Foo', 'foo/bar///baz.pm', 10, 'bar', 1, 1, q{}, 0 ],
         []
     );
 
@@ -355,6 +357,7 @@ SKIP:
 {
     my $trace = overload_no_stringify( CodeOverload->new() );
 
+    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     eval { $trace->as_string() };
 
     is(
@@ -530,7 +533,7 @@ sub overload_no_stringify {
     package    #hide
         CodeOverload;
 
-    use overload '&{}' => sub { 'foo' };
+    use overload '&{}' => sub {'foo'};
 
     sub new {
         my $class = shift;

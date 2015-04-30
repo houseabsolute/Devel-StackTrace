@@ -47,6 +47,7 @@ sub _record_caller_data {
         = $self->{no_args}
         ? caller( $x++ )
         : do {
+            ## no critic (Modules::ProhibitMultiplePackages, Variables::ProhibitPackageVars)
             package    # the newline keeps dzil from adding a version here
                 DB;
             @DB::args = ();
@@ -56,7 +57,9 @@ sub _record_caller_data {
 
         my @args;
 
+        ## no critic (Variables::ProhibitPackageVars)
         @args = $self->{no_args} ? () : @DB::args;
+        ## use critic
 
         my $raw = {
             caller => \@c,
@@ -83,10 +86,12 @@ sub _ref_to_string {
 
     return overload::AddrRef($ref) unless $self->{respect_overload};
 
+    ## no critic (Variables::RequireInitializationForLocalVars)
     local $@;
     local $SIG{__DIE__};
+    ## use critic
 
-    my $str = eval { $ref . '' };
+    my $str = eval { $ref . q{} };
 
     return $@ ? overload::AddrRef($ref) : $str;
 }
@@ -104,15 +109,17 @@ sub _make_frames {
     }
 }
 
-my $default_filter = sub { 1 };
+my $default_filter = sub {1};
 
 sub _make_frame_filter {
     my $self = shift;
 
     my ( @i_pack_re, %i_class );
     if ( $self->{ignore_package} ) {
+        ## no critic (Variables::RequireInitializationForLocalVars)
         local $@;
         local $SIG{__DIE__};
+        ## use critic
 
         $self->{ignore_package} = [ $self->{ignore_package} ]
             unless eval { @{ $self->{ignore_package} } };
@@ -175,6 +182,7 @@ sub next_frame {
     }
     else {
         $self->{index} = undef;
+        ## no critic (Subroutines::ProhibitExplicitReturnUndef)
         return undef;
     }
 }
@@ -191,6 +199,7 @@ sub prev_frame {
         return $f[ --$self->{index} ];
     }
     else {
+        ## no critic (Subroutines::ProhibitExplicitReturnUndef)
         $self->{index} = undef;
         return undef;
     }
@@ -200,6 +209,8 @@ sub reset_pointer {
     my $self = shift;
 
     $self->{index} = undef;
+
+    return;
 }
 
 sub frames {
@@ -238,7 +249,7 @@ sub as_string {
     my $self = shift;
     my $p    = shift;
 
-    my $st    = '';
+    my $st    = q{};
     my $first = 1;
     foreach my $f ( $self->frames() ) {
         $st .= $f->as_string( $first, $p ) . "\n";
@@ -249,6 +260,7 @@ sub as_string {
 }
 
 {
+    ## no critic (Modules::ProhibitMultiplePackages, ClassHierarchies::ProhibitExplicitISA)
     package    # hide from PAUSE
         Devel::StackTraceFrame;
 
