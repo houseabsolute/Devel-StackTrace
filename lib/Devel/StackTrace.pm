@@ -5,6 +5,8 @@ use 5.006;
 use strict;
 use warnings;
 
+our $VERSION = '2.01';
+
 use Devel::StackTrace::Frame;
 use File::Spec;
 use Scalar::Util qw( blessed );

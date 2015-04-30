@@ -3,6 +3,8 @@ package Devel::StackTrace::Frame;
 use strict;
 use warnings;
 
+our $VERSION = '2.01';
+
 # Create accessor routines
 BEGIN {
     no strict 'refs';
