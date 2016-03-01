@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+- Fixed the frames method so when called with arguments it correctly sets the
+  frames even if the frames have not yet been read.  Patch by Mark Fowler.
+
 2.00   2014-11-01
 
 [BACKWARDS INCOMPATIBILITIES]

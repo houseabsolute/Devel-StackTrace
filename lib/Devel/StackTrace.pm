@@ -222,6 +222,7 @@ sub frames {
             if grep { !$_->isa('Devel::StackTrace::Frame') } @_;
 
         $self->{frames} = \@_;
+        delete $self->{raw};
     }
     else {
         $self->_make_frames() if $self->{raw};
