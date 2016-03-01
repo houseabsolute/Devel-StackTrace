@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+- Fixed the frames method when it is called with arguments. Previously this
+  did not work if it was called before the method was called as a
+  reader. Fixed by Mark Fowler. PR #8.
+
+
 2.00   2014-11-01
 
 [BACKWARDS INCOMPATIBILITIES]
