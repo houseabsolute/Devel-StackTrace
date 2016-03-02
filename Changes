@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.01   2016-03-02
+
 - Fixed the frames method when it is called with arguments. Previously this
   did not work if it was called before the method was called as a
   reader. Fixed by Mark Fowler. PR #8.
