@@ -491,10 +491,4 @@ The optional C<\%p> parameter only has one option. The C<max_arg_length>
 parameter truncates each subroutine argument's string representation if it is
 longer than this number of characters.
 
-=head1 SUPPORT
-
-Please submit bugs to the CPAN RT system at
-http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel%3A%3AStackTrace
-or via email at bug-devel-stacktrace@rt.cpan.org.
-
 =cut
