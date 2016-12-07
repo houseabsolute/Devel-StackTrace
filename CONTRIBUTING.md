@@ -87,7 +87,7 @@ Once installed, here are some dzil commands you might try:
 
 You can learn more about Dist::Zilla at http://dzil.org/.
 
-The code for this distribution is [hosted at GitHub](https://github.com/autarch/Devel-StackTrace).
+The code for this distribution is [hosted at GitHub](https://github.com/houseabsolute/Devel-StackTrace).
 
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request. Detailed
@@ -96,8 +96,8 @@ instructions for doing that is available here:
 https://help.github.com/articles/creating-a-pull-request
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
-can submit an issue report [via the web](http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-StackTrace)
-or [via email](bug-devel-stacktrace@rt.cpan.org.
+can submit an issue report [via the web](https://github.com/houseabsolute/Devel-StackTrace/issues)
+).
 This is a good place to send your questions about the usage of this distribution.
 
 ## Travis
@@ -121,11 +121,11 @@ brings up.
 
 ## Contributor Names
 
-If you send me a patch or pull request, your name and email address will be
+If you send a patch or pull request, your name and email address will be
 included in the documentation as a contributor (using the attribution on the
 commit or patch), unless you specifically request for it not to be. If you
 wish to be listed under a different name or address, you should submit a pull
 request to the .mailmap file to contain the correct mapping.
 
-This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.009 from a
-template file originating in Dist-Zilla-PluginBundle-DROLSKY-0.53.
+This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.012 from a
+template file originating in Dist-Zilla-PluginBundle-DROLSKY-0.78.

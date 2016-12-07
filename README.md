@@ -10,30 +10,30 @@ version 2.02
 
     use Devel::StackTrace;
 
-    my $trace = Devel::StackTrace->new();
+    my $trace = Devel::StackTrace->new;
 
-    print $trace->as_string(); # like carp
+    print $trace->as_string; # like carp
 
     # from top (most recent) of stack to bottom.
-    while ( my $frame = $trace->next_frame() ) {
-        print "Has args\n" if $frame->hasargs();
+    while ( my $frame = $trace->next_frame ) {
+        print "Has args\n" if $frame->hasargs;
     }
 
     # from bottom (least recent) of stack to top.
-    while ( my $frame = $trace->prev_frame() ) {
-        print "Sub: ", $frame->subroutine(), "\n";
+    while ( my $frame = $trace->prev_frame ) {
+        print "Sub: ", $frame->subroutine, "\n";
     }
 
 # DESCRIPTION
 
 The `Devel::StackTrace` module contains two classes, `Devel::StackTrace` and
 [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame). These objects encapsulate the information that
-can retrieved via Perl's `caller()` function, as well as providing a simple
+can retrieved via Perl's `caller` function, as well as providing a simple
 interface to this data.
 
 The `Devel::StackTrace` object contains a set of `Devel::StackTrace::Frame`
 objects, one for each level of the stack. The frames contain all the data
-available from `caller()`.
+available from `caller`.
 
 This code was created to support my [Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base) class (part of
 [Exception::Class](https://metacpan.org/pod/Exception::Class)) but may be useful in other contexts.
@@ -53,7 +53,7 @@ Here's an example:
     }
 
     sub bar {
-       Devel::StackTrace->new();  # top frame is here.
+       Devel::StackTrace->new;  # top frame is here.
     }
 
 # METHODS
@@ -68,20 +68,20 @@ Takes the following parameters:
 
 - frame\_filter => $sub
 
-    By default, Devel::StackTrace will include all stack frames before the
-    call to its constructor.
+    By default, Devel::StackTrace will include all stack frames before the call to
+    its constructor.
 
-    However, you may want to filter out some frames with more granularity
-    than 'ignore\_package' or 'ignore\_class' allow.
+    However, you may want to filter out some frames with more granularity than
+    'ignore\_package' or 'ignore\_class' allow.
 
-    You can provide a subroutine which is called with the raw frame data
-    for each frame. This is a hash reference with two keys, "caller", and
-    "args", both of which are array references. The "caller" key is the
-    raw data as returned by Perl's `caller()` function, and the "args"
-    key are the subroutine arguments found in `@DB::args`.
+    You can provide a subroutine which is called with the raw frame data for each
+    frame. This is a hash reference with two keys, "caller", and "args", both of
+    which are array references. The "caller" key is the raw data as returned by
+    Perl's `caller` function, and the "args" key are the subroutine arguments
+    found in `@DB::args`.
 
-    The filter should return true if the frame should be included, or
-    false if it should be skipped.
+    The filter should return true if the frame should be included, or false if it
+    should be skipped.
 
 - filter\_frames\_early => $boolean
 
@@ -95,18 +95,17 @@ Takes the following parameters:
 
 - ignore\_package => $package\_name OR \\@package\_names
 
-    Any frames where the package is one of these packages will not be on
-    the stack.
+    Any frames where the package is one of these packages will not be on the
+    stack.
 
 - ignore\_class => $package\_name OR \\@package\_names
 
-    Any frames where the package is a subclass of one of these packages
-    (or is the same package) will not be on the stack.
+    Any frames where the package is a subclass of one of these packages (or is the
+    same package) will not be on the stack.
 
-    Devel::StackTrace internally adds itself to the 'ignore\_package'
-    parameter, meaning that the Devel::StackTrace package is **ALWAYS**
-    ignored. However, if you create a subclass of Devel::StackTrace it
-    will not be ignored.
+    Devel::StackTrace internally adds itself to the 'ignore\_package' parameter,
+    meaning that the Devel::StackTrace package is **ALWAYS** ignored. However, if
+    you create a subclass of Devel::StackTrace it will not be ignored.
 
 - skip\_frames => $integer
 
@@ -117,8 +116,8 @@ Takes the following parameters:
 
 - unsafe\_ref\_capture => $boolean
 
-    If this parameter is true, then Devel::StackTrace will store
-    references internally when generating stacktrace frames.
+    If this parameter is true, then Devel::StackTrace will store references
+    internally when generating stacktrace frames.
 
     **This option is very dangerous, and should never be used with exception
     objects**. Using this option will keep any objects or references alive past
@@ -136,11 +135,11 @@ Takes the following parameters:
 
 - respect\_overload => $boolean
 
-    By default, Devel::StackTrace will call `overload::AddrRef()` to get
-    the underlying string representation of an object, instead of
-    respecting the object's stringification overloading. If you would
-    prefer to see the overloaded representation of objects in stack
-    traces, then set this parameter to true.
+    By default, Devel::StackTrace will call `overload::AddrRef` to get the
+    underlying string representation of an object, instead of respecting the
+    object's stringification overloading. If you would prefer to see the
+    overloaded representation of objects in stack traces, then set this parameter
+    to true.
 
 - max\_arg\_length => $integer
 
@@ -158,29 +157,29 @@ Takes the following parameters:
 - indent => $boolean
 
     If this parameter is true, each stack frame after the first will start with a
-    tab character, just like `Carp::confess()`.
+    tab character, just like `Carp::confess`.
 
-## $trace->next\_frame()
+## $trace->next\_frame
 
 Returns the next [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) object on the stack, going
 down. If this method hasn't been called before it returns the first frame. It
 returns `undef` when it reaches the bottom of the stack and then resets its
-pointer so the next call to `$trace->next_frame()` or `$trace->prev_frame()` will work properly.
+pointer so the next call to `$trace->next_frame` or `$trace->prev_frame` will work properly.
 
-## $trace->prev\_frame()
+## $trace->prev\_frame
 
 Returns the next [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) object on the stack, going up. If
 this method hasn't been called before it returns the last frame. It returns
 undef when it reaches the top of the stack and then resets its pointer so the
-next call to `$trace->next_frame()` or `$trace->prev_frame()` will
-work properly.
+next call to `$trace->next_frame` or `$trace->prev_frame` will work
+properly.
 
 ## $trace->reset\_pointer
 
-Resets the pointer so that the next call to `$trace->next_frame()` or `$trace->prev_frame()` will start at the top or bottom of the stack, as
+Resets the pointer so that the next call to `$trace->next_frame` or `$trace->prev_frame` will start at the top or bottom of the stack, as
 appropriate.
 
-## $trace->frames()
+## $trace->frames
 
 When this method is called with no arguments, it returns a list of
 [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) objects. They are returned in order from top (most
@@ -190,9 +189,9 @@ This method can also be used to set the object's frames if you pass it a list
 of [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) objects.
 
 This is useful if you want to filter the list of frames in ways that are more
-complex than can be handled by the `$trace->filter_frames()` method:
+complex than can be handled by the `$trace->filter_frames` method:
 
-    $stacktrace->frames( my_filter( $stacktrace->frames() ) );
+    $stacktrace->frames( my_filter( $stacktrace->frames ) );
 
 ## $trace->frame($index)
 
@@ -200,13 +199,13 @@ Given an index, this method returns the relevant frame, or undef if there is
 no frame at that index. The index is exactly like a Perl array. The first
 frame is 0 and negative indexes are allowed.
 
-## $trace->frame\_count()
+## $trace->frame\_count
 
 Returns the number of frames in the trace object.
 
 ## $trace->as\_string(\\%p)
 
-Calls `$frame->as_string()` on each frame from top to bottom, producing
+Calls `$frame->as_string` on each frame from top to bottom, producing
 output quite similar to the Carp module's cluck/confess methods.
 
 The optional `\%p` parameter only has one option. The `max_arg_length`
@@ -215,14 +214,9 @@ longer than this number of characters.
 
 # SUPPORT
 
-Please submit bugs to the CPAN RT system at
-http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel%3A%3AStackTrace
-or via email at bug-devel-stacktrace@rt.cpan.org.
+Bugs may be submitted through [https://github.com/houseabsolute/Devel-StackTrace/issues](https://github.com/houseabsolute/Devel-StackTrace/issues).
 
-Bugs may be submitted through [the RT bug tracker](http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-StackTrace)
-(or [bug-devel-stacktrace@rt.cpan.org](mailto:bug-devel-stacktrace@rt.cpan.org)).
-
-I am also usually active on IRC as 'drolsky' on `irc://irc.perl.org`.
+I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
 # DONATIONS
 
@@ -243,18 +237,18 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 # AUTHOR
 
-Dave Rolsky &lt;autarch@urth.org>
+Dave Rolsky <autarch@urth.org>
 
 # CONTRIBUTORS
 
-- Dagfinn Ilmari Mannsåker &lt;ilmari@ilmari.org>
-- David Cantrell &lt;david@cantrell.org.uk>
-- Graham Knop &lt;haarg@haarg.org>
-- Ivan Bessarabov &lt;ivan@bessarabov.ru>
-- Mark Fowler &lt;mark@twoshortplanks.com>
-- Ricardo Signes &lt;rjbs@cpan.org>
+- Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+- David Cantrell <david@cantrell.org.uk>
+- Graham Knop <haarg@haarg.org>
+- Ivan Bessarabov <ivan@bessarabov.ru>
+- Mark Fowler <mark@twoshortplanks.com>
+- Ricardo Signes <rjbs@cpan.org>
 
-# COPYRIGHT AND LICENCE
+# COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2000 - 2016 by David Rolsky.
 
