@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+- Switch to GitHub Issues.
+
+- Some small pod fixes.
+
+
 2.01   2016-03-02
 
 - Fixed the frames method when it is called with arguments. Previously this
