@@ -9,19 +9,37 @@ our $VERSION = '2.03';
 BEGIN {
     ## no critic (TestingAndDebugging::ProhibitNoStrict)
     no strict 'refs';
-    foreach my $f (
-        qw( package filename line subroutine hasargs
-        wantarray evaltext is_require hints bitmask args )
-        ) {
-        next if $f eq 'args';
-        *{$f} = sub { my $s = shift; return $s->{$f} };
+
+    my @attrs = qw(
+        package
+        filename
+        line
+        subroutine
+        hasargs
+        wantarray
+        evaltext
+        is_require
+        hints
+        bitmask
+    );
+
+    for my $a (@attrs) {
+        *{$a} = sub { my $s = shift; return $s->{$a} };
     }
 }
 
 {
-    my @fields = (
-        qw( package filename line subroutine hasargs wantarray
-            evaltext is_require hints bitmask )
+    my @args = qw(
+        package
+        filename
+        line
+        subroutine
+        hasargs
+        wantarray
+        evaltext
+        is_require
+        hints
+        bitmask
     );
 
     sub new {
@@ -30,20 +48,15 @@ BEGIN {
 
         my $self = bless {}, $class;
 
-        @{$self}{@fields} = @{ shift() };
+        @{$self}{@args} = @{ shift() };
+        $self->{args}             = shift;
+        $self->{respect_overload} = shift;
+        $self->{max_arg_length}   = shift;
+        $self->{message}          = shift;
+        $self->{indent}           = shift;
 
         # fixup unix-style paths on win32
         $self->{filename} = File::Spec->canonpath( $self->{filename} );
-
-        $self->{args} = shift;
-
-        $self->{respect_overload} = shift;
-
-        $self->{max_arg_length} = shift;
-
-        $self->{message} = shift;
-
-        $self->{indent} = shift;
 
         return $self;
     }
