@@ -246,18 +246,28 @@ sub frame_count {
     return scalar( $self->frames );
 }
 
+sub message { $_[0]->{message} }
+
 sub as_string {
     my $self = shift;
     my $p    = shift;
 
-    my $st    = q{};
-    my $first = 1;
-    foreach my $f ( $self->frames ) {
-        $st .= $f->as_string( $first, $p ) . "\n";
-        $first = 0;
+    my @frames = $self->frames;
+    if (@frames) {
+        my $st    = q{};
+        my $first = 1;
+        for my $f (@frames) {
+            $st .= $f->as_string( $first, $p ) . "\n";
+            $first = 0;
+        }
+
+        return $st;
     }
 
-    return $st;
+    my $msg = $self->message;
+    return $msg if defined $msg;
+
+    return 'Trace begun';
 }
 
 {
@@ -489,5 +499,13 @@ output quite similar to the Carp module's cluck/confess methods.
 The optional C<\%p> parameter only has one option. The C<max_arg_length>
 parameter truncates each subroutine argument's string representation if it is
 longer than this number of characters.
+
+If all the frames in a trace are skipped then this just returns the C<message>
+passed to the constructor or the string C<"Trace begun">.
+
+=head2 $trace->message
+
+Returns the message passed to the constructor. If this wasn't passed then this
+method returns C<undef>.
 
 =cut
