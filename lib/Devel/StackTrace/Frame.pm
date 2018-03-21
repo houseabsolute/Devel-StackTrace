@@ -3,6 +3,8 @@ package Devel::StackTrace::Frame;
 use strict;
 use warnings;
 
+use Cwd 'realpath';
+
 our $VERSION = '2.04';
 
 # Create accessor routines
@@ -54,9 +56,6 @@ BEGIN {
         $self->{max_arg_length}   = shift;
         $self->{message}          = shift;
         $self->{indent}           = shift;
-
-        # fixup unix-style paths on win32
-        $self->{filename} = File::Spec->canonpath( $self->{filename} );
 
         return $self;
     }
