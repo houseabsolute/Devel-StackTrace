@@ -53,7 +53,7 @@ sub _record_caller_data {
             @DB::args = ();
             caller( $x++ );
         }
-        ) {
+    ) {
 
         my @args;
 
