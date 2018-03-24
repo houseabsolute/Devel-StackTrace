@@ -3,8 +3,6 @@ package Devel::StackTrace::Frame;
 use strict;
 use warnings;
 
-use Cwd 'realpath';
-
 our $VERSION = '2.04';
 
 # Create accessor routines
