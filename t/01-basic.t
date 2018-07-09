@@ -403,7 +403,7 @@ SKIP:
 {
     my $frame = quux()->frame(0);
     is(
-        "$frame", $frame->as_string, 
+        "$frame", $frame->as_string,
         'frame stringification'
     );
 }
