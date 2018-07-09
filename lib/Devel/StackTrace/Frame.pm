@@ -32,7 +32,7 @@ BEGIN {
 
 # XXX -- Arguments are garbled if giving overload \&as_string or 'as_string' directly.
 use overload
-    '""' => sub { $_[0]->as_string },
+    '""'     => sub { $_[0]->as_string },
     fallback => 1;
 
 {

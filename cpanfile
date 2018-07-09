@@ -1,3 +1,4 @@
+requires "DDP" => "0";
 requires "File::Spec" => "0";
 requires "Scalar::Util" => "0";
 requires "overload" => "0";
@@ -11,7 +12,6 @@ on 'test' => sub {
   requires "Test::More" => "0.96";
   requires "base" => "0";
   requires "bytes" => "0";
-  requires "perl" => "5.006";
 };
 
 on 'test' => sub {
@@ -20,7 +20,6 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.006";
 };
 
 on 'configure' => sub {
@@ -53,4 +52,5 @@ on 'develop' => sub {
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
+  requires "blib" => "1.01";
 };
