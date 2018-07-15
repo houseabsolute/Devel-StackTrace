@@ -23,8 +23,8 @@ BEGIN {
         bitmask
     );
 
-    for my $a (@attrs) {
-        *{$a} = sub { my $s = shift; return $s->{$a} };
+    for my $attr (@attrs) {
+        *{$attr} = sub { my $s = shift; return $s->{$attr} };
     }
 }
 
