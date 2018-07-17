@@ -399,6 +399,15 @@ SKIP:
     );
 }
 
+# Stringification of frame
+{
+    my $frame = quux()->frame(0);
+    is(
+        "$frame", $frame->as_string,
+        'frame stringification'
+    );
+}
+
 done_testing();
 
 # This means I can move these lines down without constantly fiddling

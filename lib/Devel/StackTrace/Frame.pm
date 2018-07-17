@@ -3,6 +3,8 @@ package Devel::StackTrace::Frame;
 use strict;
 use warnings;
 
+use DDP;
+
 our $VERSION = '2.04';
 
 # Create accessor routines
@@ -27,6 +29,11 @@ BEGIN {
         *{$attr} = sub { my $s = shift; return $s->{$attr} };
     }
 }
+
+# XXX -- Arguments are garbled if giving overload \&as_string or 'as_string' directly.
+use overload
+    '""'     => sub { $_[0]->as_string },
+    fallback => 1;
 
 {
     my @args = qw(
