@@ -3,7 +3,7 @@ package Devel::StackTrace::Frame;
 use strict;
 use warnings;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 # Create accessor routines
 BEGIN {
