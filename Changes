@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.04   2019-05-24
+
 - Add a partial workaround for "Bizarre copy" errors (GH #11) that come when
   attempting to look at arguments in the call stack. This is only a partial
   fix as there are cases that can lead to a SEGV. Ultimately this needs to be
