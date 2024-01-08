@@ -13,6 +13,7 @@ use Scalar::Util qw( blessed );
 
 use overload
     '""'     => \&as_string,
+    bool     => sub {1},
     fallback => 1;
 
 sub new {
