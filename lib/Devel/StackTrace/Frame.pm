@@ -188,15 +188,28 @@ return.
 
 =head2 $frame->package
 
+The package which created this frame.
+
 =head2 $frame->filename
+
+The filename which created this frame.
 
 =head2 $frame->line
 
+The line where the frame was created.
+
 =head2 $frame->subroutine
+
+The subroutine which created this frame.
 
 =head2 $frame->hasargs
 
+This will be true if a new C<@_> was created for this this frame.
+
 =head2 $frame->wantarray
+
+This indicates the context for the call for this frame. This will be true if
+called in array context, false in scalar context, and C<undef> in void context.
 
 =head2 $frame->evaltext
 
@@ -213,7 +226,11 @@ references are returned as references, not copies.
 
 =head2 $frame->hints
 
+Returns the value of C<$^H> for this frame.
+
 =head2 $frame->bitmask
+
+Returns the value of C<$bitmask> for this frame.
 
 =head2 $frame->as_string
 

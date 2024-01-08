@@ -27,8 +27,8 @@ version 2.05
 # DESCRIPTION
 
 The `Devel::StackTrace` module contains two classes, `Devel::StackTrace` and
-[Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame). These objects encapsulate the information that
-can retrieved via Perl's `caller` function, as well as providing a simple
+[Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame). These objects encapsulate the information that can
+retrieved via Perl's `caller` function, as well as providing a simple
 interface to this data.
 
 The `Devel::StackTrace` object contains a set of `Devel::StackTrace::Frame`
@@ -90,13 +90,12 @@ Takes the following parameters:
     `unsafe_ref_capture` is not set), rather than being filtered lazily when
     [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame) objects are first needed.
 
-    This is useful if you want to filter based on the frame's arguments and want
-    to be able to examine object properties, for example.
+    This is useful if you want to filter based on the frame's arguments and want to
+    be able to examine object properties, for example.
 
 - ignore\_package => $package\_name OR \\@package\_names
 
-    Any frames where the package is one of these packages will not be on the
-    stack.
+    Any frames where the package is one of these packages will not be on the stack.
 
 - ignore\_class => $package\_name OR \\@package\_names
 
@@ -111,8 +110,8 @@ Takes the following parameters:
 
     This will cause this number of stack frames to be excluded from top of the
     stack trace. This prevents the frames from being captured at all, and applies
-    before the `frame_filter`, `ignore_package`, or `ignore_class` options,
-    even with `filter_frames_early`.
+    before the `frame_filter`, `ignore_package`, or `ignore_class` options, even
+    with `filter_frames_early`.
 
 - unsafe\_ref\_capture => $boolean
 
@@ -137,9 +136,8 @@ Takes the following parameters:
 
     By default, Devel::StackTrace will call `overload::AddrRef` to get the
     underlying string representation of an object, instead of respecting the
-    object's stringification overloading. If you would prefer to see the
-    overloaded representation of objects in stack traces, then set this parameter
-    to true.
+    object's stringification overloading. If you would prefer to see the overloaded
+    representation of objects in stack traces, then set this parameter to true.
 
 - max\_arg\_length => $integer
 
@@ -161,10 +159,11 @@ Takes the following parameters:
 
 ## $trace->next\_frame
 
-Returns the next [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame) object on the stack, going
-down. If this method hasn't been called before it returns the first frame. It
-returns `undef` when it reaches the bottom of the stack and then resets its
-pointer so the next call to `$trace->next_frame` or `$trace->prev_frame` will work properly.
+Returns the next [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame) object on the stack, going down.
+If this method hasn't been called before it returns the first frame. It returns
+`undef` when it reaches the bottom of the stack and then resets its pointer so
+the next call to `$trace->next_frame` or `$trace->prev_frame` will
+work properly.
 
 ## $trace->prev\_frame
 
@@ -195,9 +194,9 @@ complex than can be handled by the `$trace->filter_frames` method:
 
 ## $trace->frame($index)
 
-Given an index, this method returns the relevant frame, or undef if there is
-no frame at that index. The index is exactly like a Perl array. The first
-frame is 0 and negative indexes are allowed.
+Given an index, this method returns the relevant frame, or undef if there is no
+frame at that index. The index is exactly like a Perl array. The first frame is
+0 and negative indexes are allowed.
 
 ## $trace->frame\_count
 
