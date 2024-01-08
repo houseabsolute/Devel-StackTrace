@@ -55,9 +55,6 @@ BEGIN {
         $self->{message}          = shift;
         $self->{indent}           = shift;
 
-        # fixup unix-style paths on win32
-        $self->{filename} = File::Spec->canonpath( $self->{filename} );
-
         return $self;
     }
 }
