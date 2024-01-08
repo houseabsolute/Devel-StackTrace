@@ -183,8 +183,8 @@ See L<Devel::StackTrace> for details.
 
 =head1 METHODS
 
-See Perl's C<caller> documentation for more information on what these
-methods return.
+See Perl's C<caller> documentation for more information on what these methods
+return.
 
 =head2 $frame->package
 
