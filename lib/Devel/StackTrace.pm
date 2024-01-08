@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 use Devel::StackTrace::Frame;
 use File::Spec;
