@@ -61,7 +61,7 @@ sub _record_caller_data {
         ## no critic (Variables::ProhibitPackageVars, BuiltinFunctions::ProhibitComplexMappings)
         unless ( $self->{no_args} ) {
 
-            # This is the same workaroud as was applied to Carp.pm a little
+            # This is the same workaround as was applied to Carp.pm a little
             # while back
             # (https://rt.perl.org/Public/Bug/Display.html?id=131046):
             #

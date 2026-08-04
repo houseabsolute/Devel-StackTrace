@@ -1,0 +1,4 @@
+# "Signes" is Ricardo Signes' surname, which typos wants to "correct" to
+# "Signs".
+[default.extend-words]
+Signes = "Signes"
