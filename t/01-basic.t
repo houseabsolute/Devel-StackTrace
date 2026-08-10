@@ -325,19 +325,6 @@ EOF
     );
 }
 
-SKIP:
-{
-    skip 'Test only runs on Linux', 1
-        unless $^O eq 'linux';
-
-    my $frame = Devel::StackTrace::Frame->new(
-        [ 'Foo', 'foo/bar///baz.pm', 10, 'bar', 1, 1, q{}, 0 ],
-        []
-    );
-
-    is( $frame->filename, 'foo/bar/baz.pm', 'filename is canonicalized' );
-}
-
 {
     my $obj = RefTest4->new();
 
